@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Kullanıcılar</h2>
+        <a href="{{ url_for('main.add_user') }}" class="btn btn-success">+ Yeni Kullanıcı Ekle</a>
+    </div>
+
+    <table class="table table-bordered table-hover table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th>ID</th>
+                <th>Kullanıcı Adı</th>
+                <th>Rol</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                    {% if current_user.id != user.id %}
+                    <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display:inline-block;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">Sil</button>
+                    </form>
+                    {% else %}
+                    <span class="text-muted">Kendi hesabınız</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Hiç kullanıcı bulunamadı.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

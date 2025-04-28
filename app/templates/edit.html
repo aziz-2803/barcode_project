@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container-fluid mt-4">
+
+    <h3 class="mb-4 text-center">Malzeme Düzenle</h3>
+
+    <form action="{{ url_for('main.edit_item', item_id=item.id) }}" method="POST" class="card shadow-sm p-4">
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Adı</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ item.name }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Konum</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ item.location }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="maintenance_date" class="form-label">Bakım Tarihi</label>
+            <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" value="{{ item.maintenance_date.strftime('%Y-%m-%d') }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="status" class="form-label">Durum</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="Çalışıyor" {% if item.status == 'Çalışıyor' %}selected{% endif %}>Çalışıyor</option>
+                <option value="Bakım Gerekli" {% if item.status == 'Bakım Gerekli' %}selected{% endif %}>Bakım Gerekli</option>
+                <option value="Arızalı" {% if item.status == 'Arızalı' %}selected{% endif %}>Arızalı</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">İptal</a>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

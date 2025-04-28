@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        📦 Malzeme Yönetimi
+    </h1>
+    <div class="page-actions">
+        <a href="{{ url_for('main.add_item') }}" class="add-item-btn">➕ Yeni Malzeme Ekle</a>
+        <form action="{{ url_for('main.materials') }}" method="get" class="search-form">
+            <input type="text" name="search" placeholder="Malzeme ara..." value="{{ request.args.get('search', '') }}">
+            <button type="submit">🔍</button>
+        </form>
+    </div>
+</div>
+
+<div class="materials-table">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>İsim</th>
+                <th>Konum</th>
+                <th>Bakım Tarihi</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.location }}</td>
+                <td>{{ item.maintenance_date.strftime('%d.%m.%Y') }}</td>
+                <td>
+                    {% if item.status == 'Çalışıyor' %}
+                        <span class="badge badge-success">Çalışıyor</span>
+                    {% elif item.status == 'Bakım Gerekli' %}
+                        <span class="badge badge-warning">Bakım Gerekli</span>
+                    {% elif item.status == 'Arızalı' %}
+                        <span class="badge badge-danger">Arızalı</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="edit-btn">Detay</a>
+                    <form action="{{ url_for('main.delete_item', item_id=item.id) }}" method="POST" class="delete-form" style="display:inline;">
+                        <button type="submit" class="delete-btn" onclick="return confirm('Bu malzemeyi silmek istediğinizden emin misiniz?')">🗑️ Sil</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

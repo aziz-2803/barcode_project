@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Yeni Kullanıcı Ekle</h2>
+
+    <form action="{{ url_for('main.add_user') }}" method="POST" class="card p-4 shadow-sm bg-white">
+
+        <div class="mb-3">
+            <label for="username" class="form-label">Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Şifre</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="role" class="form-label">Rol</label>
+            <select class="form-select" id="role" name="role" required>
+                <option value="Admin">Admin</option>
+                <option value="Kullanıcı">Kullanıcı</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a href="{{ url_for('main.users') }}" class="btn btn-secondary ms-2">İptal</a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

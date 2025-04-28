@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Malzeme Yönetimi</h2>
+        <a href="{{ url_for('main.add_item') }}" class="btn btn-success">+ Yeni Malzeme Ekle</a>
+    </div>
+
+    <div class="card shadow-sm" style="border-radius: 15px;">
+        <div class="card-body">
+
+            <div class="input-group mb-3" style="max-width: 400px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Malzeme Ara...">
+                <button class="btn btn-primary" onclick="searchTable()">Ara</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="materialsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Adı</th>
+                            <th>Konum</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.location }}</td>
+                            <td>
+                                {% if item.status == 'Çalışıyor' %}
+                                    <span class="badge" style="background-color: #c8e6c9; color: #256029;"><i class="fas fa-check-circle me-1"></i> {{ item.status }}</span>
+                                {% elif item.status == 'Bakım Gerekli' %}
+                                    <span class="badge" style="background-color: #fff3cd; color: #856404;"><i class="fas fa-exclamation-circle me-1"></i> {{ item.status }}</span>
+                                {% elif item.status == 'Arızalı' %}
+                                    <span class="badge" style="background-color: #f8d7da; color: #721c24;"><i class="fas fa-times-circle me-1"></i> {{ item.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ item.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="btn btn-outline-primary btn-sm">Detay</a>
+                                <a href="{{ url_for('main.edit_item', item_id=item.id) }}" class="btn btn-outline-warning btn-sm">Düzenle</a>
+                                <form action="{{ url_for('main.delete_item', item_id=item.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Silmek istediğinize emin misiniz?')">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- سكريبت البحث -->
+<script>
+function searchTable() {
+    var input = document.getElementById("searchInput").value.toLowerCase();
+    var rows = document.querySelectorAll("#materialsTable tbody tr");
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        if (text.indexOf(input) > -1) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+</script>
+{% endblock %}
