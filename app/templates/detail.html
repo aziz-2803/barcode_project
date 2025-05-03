@@ -1,45 +1,32 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="container-fluid mt-4">
-
-    <div class="card shadow-sm" style="border-radius: 15px;">
-        <div class="card-body">
-            <h3 class="mb-4 text-center">Malzeme Detayları</h3>
-
-            <div class="mb-3">
-                <strong>Adı:</strong> {{ item.name }}
-            </div>
-
-            <div class="mb-3">
-                <strong>Konum:</strong> {{ item.location }}
-            </div>
-
-            <div class="mb-3">
-                <strong>Bakım Tarihi:</strong> {{ item.maintenance_date.strftime('%d.%m.%Y') }}
-            </div>
-
-            <div class="mb-3">
-                <strong>Durum:</strong>
-                {% if item.status == 'Çalışıyor' %}
-                    <span class="badge" style="background-color: #c8e6c9; color: #256029;"><i class="fas fa-check-circle me-1"></i> {{ item.status }}</span>
-                {% elif item.status == 'Bakım Gerekli' %}
-                    <span class="badge" style="background-color: #fff3cd; color: #856404;"><i class="fas fa-exclamation-circle me-1"></i> {{ item.status }}</span>
-                {% elif item.status == 'Arızalı' %}
-                    <span class="badge" style="background-color: #f8d7da; color: #721c24;"><i class="fas fa-times-circle me-1"></i> {{ item.status }}</span>
-                {% else %}
-                    <span class="badge bg-secondary">{{ item.status }}</span>
-                {% endif %}
-            </div>
-
-            <div class="d-flex justify-content-between">
-                <a href="{{ url_for('main.edit_item', item_id=item.id) }}" class="btn btn-warning">Düzenle</a>
-                <form action="{{ url_for('main.delete_item', item_id=item.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Bu malzemeyi silmek istediğinize emin misiniz?')">Sil</button>
-                </form>
-            </div>
-
-        </div>
+<div class="container mt-5">
+  <h2 class="mb-4"><i class="fas fa-clipboard-list"></i> Malzeme Detayları</h2>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <p><strong>Barkod:</strong> {{ parca.barcode }}</p>
+      <p><strong>Ekipman Türü:</strong> {{ parca.ekipman_turu }}</p>
+      <p><strong>Model Adı:</strong> {{ parca.model_adi }}</p>
+      <p><strong>Konum:</strong> {{ parca.konum }}</p>
+      <p><strong>Yük Kapasitesi:</strong> {{ parca.yuk_kapasitesi }}</p>
+      <p><strong>Sorumlu Kişi:</strong> {{ parca.sorumlu_kisi }}</p>
+      <p><strong>Bir Sonraki Bakım:</strong> {{ parca.bir_sonraki_bakim }}</p>
+      <p><strong>Durum:</strong> 
+        {% if parca.durum == 'Kullanıma hazır' %}
+          <span class="badge bg-success text-white">{{ parca.durum }}</span>
+        {% elif parca.durum == 'Bakım Gerekli' %}
+          <span class="badge bg-warning text-dark">{{ parca.durum }}</span>
+        {% else %}
+          <span class="badge bg-danger text-white">{{ parca.durum }}</span>
+        {% endif %}
+      </p>
+      <p><strong>Açıklama / Not:</strong><br>{{ parca.kisa_aciklama }}</p>
+      <form method="POST" action="{{ url_for('main.delete_parca', parca_id=parca.id) }}" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+        <a href="{{ url_for('main.edit', parca_id=parca.id) }}" class="btn btn-primary">Düzenle</a>
+        <button type="submit" class="btn btn-danger">Sil</button>
+        <a href="{{ url_for('main.malzeme_listesi') }}" class="btn btn-secondary">Geri Dön</a>
+      </form>
     </div>
-
+  </div>
 </div>
 {% endblock %}

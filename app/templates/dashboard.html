@@ -1,133 +1,76 @@
 {% extends 'layout.html' %}
 {% block content %}
+<div class="container-fluid">
 
-<div class="container-fluid mt-4">
-
-    <!-- كروت الإحصائيات -->
-    <div class="row text-center mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm" style="background-color: #e3f2fd; border-radius: 15px; cursor: pointer;" onclick="filterTable('')">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: #0d6efd;">Tüm Malzemeler</h5>
-                    <p class="card-text fs-4">{{ items|length }} adet</p>
+    <!-- Sayaç Kartları -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body bg-light">
+                    <h6><a href="{{ url_for('main.dashboard') }}" class="text-decoration-none text-primary">Tüm Malzemeler</a></h6>
+                    <h5>{{ parcalar|length }} adet</h5>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm" style="background-color: #e8f5e9; border-radius: 15px; cursor: pointer;" onclick="filterTable('Çalışıyor')">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: #28a745;">Çalışıyor</h5>
-                    <p class="card-text fs-4">{{ working }} adet</p>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body bg-success bg-opacity-10">
+                    <h6 class="text-success">Kullanıma Hazır</h6>
+                    <h5>{{ hazir }} adet</h5>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm" style="background-color: #fff9e6; border-radius: 15px; cursor: pointer;" onclick="filterTable('Bakım Gerekli')">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: #ffc107;">Bakım Gerekli</h5>
-                    <p class="card-text fs-4">{{ maintenance }} adet</p>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body bg-warning bg-opacity-10">
+                    <h6 class="text-warning">Bakım Gerekli</h6>
+                    <h5>{{ bakım }} adet</h5>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow-sm" style="background-color: #fdecea; border-radius: 15px; cursor: pointer;" onclick="filterTable('Arızalı')">
-                <div class="card-body">
-                    <h5 class="card-title" style="color: #dc3545;">Arızalı</h5>
-                    <p class="card-text fs-4">{{ broken }} adet</p>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body bg-danger bg-opacity-10">
+                    <h6 class="text-danger">Arızalı</h6>
+                    <h5>{{ arizali }} adet</h5>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- عداد عدد العناصر الظاهرة -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 id="countInfo">Toplam {{ items|length }} Malzeme Gösteriliyor</h5>
-        <div class="input-group" style="max-width: 300px;">
-            <input type="text" id="searchInput" class="form-control" placeholder="Malzeme Ara...">
-            <button class="btn btn-primary" onclick="searchTable()">Ara</button>
-        </div>
-    </div>
-
-    <!-- جدول القطع -->
-    <div class="card shadow-sm" style="border-radius: 15px;">
-        <div class="card-body table-responsive">
-            <table class="table table-hover align-middle" id="materialsTable">
-                <thead class="table-light">
-                    <tr>
-                        <th>Adı</th>
-                        <th>Konum</th>
-                        <th>Durum</th>
-                        <th>Detay</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr data-status="{{ item.status|lower }}">
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.location }}</td>
-                        <td>
-                            {% if item.status == 'Çalışıyor' %}
-                                <span class="badge" style="background-color: #c8e6c9; color: #256029;"><i class="fas fa-check-circle me-1"></i> {{ item.status }}</span>
-                            {% elif item.status == 'Bakım Gerekli' %}
-                                <span class="badge" style="background-color: #fff3cd; color: #856404;"><i class="fas fa-exclamation-circle me-1"></i> {{ item.status }}</span>
-                            {% elif item.status == 'Arızalı' %}
-                                <span class="badge" style="background-color: #f8d7da; color: #721c24;"><i class="fas fa-times-circle me-1"></i> {{ item.status }}</span>
-                            {% else %}
-                                <span class="badge bg-secondary">{{ item.status }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-primary">Detay</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
+    <!-- Liste Tablosu -->
+    <h5>Toplam {{ parcalar|length }} Malzeme Gösteriliyor</h5>
+    <table class="table table-bordered bg-white shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Adı</th>
+                <th>Konum</th>
+                <th>Durum</th>
+                <th>Detay</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for parca in parcalar %}
+            <tr>
+                <td>{{ parca.model_adi }}</td>
+                <td>{{ parca.konum }}</td>
+                <td>
+                    {% if parca.durum == 'Kullanıma hazır' %}
+                        <span class="badge bg-success">{{ parca.durum }}</span>
+                    {% elif parca.durum == 'Bakım Gerekli' %}
+                        <span class="badge bg-warning text-dark">{{ parca.durum }}</span>
+                    {% elif parca.durum == 'Arızalı' %}
+                        <span class="badge bg-danger">{{ parca.durum }}</span>
+                    {% else %}
+                        {{ parca.durum }}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="btn btn-sm btn-outline-primary">Detay</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-
-<!-- سكريبت البحث والفلاتر -->
-<script>
-function filterTable(status) {
-    var rows = document.querySelectorAll("#materialsTable tbody tr");
-    var count = 0;
-
-    rows.forEach(row => {
-        let itemStatus = row.getAttribute("data-status").toLowerCase();
-        if (!status || itemStatus.includes(status.toLowerCase())) {
-            row.style.display = "";
-            count++;
-        } else {
-            row.style.display = "none";
-        }
-    });
-
-    // تحديث عداد العناصر
-    document.getElementById("countInfo").innerText = "Toplam " + count + " Malzeme Gösteriliyor";
-}
-
-function searchTable() {
-    var input = document.getElementById("searchInput").value.toLowerCase();
-    var rows = document.querySelectorAll("#materialsTable tbody tr");
-    var count = 0;
-
-    rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
-        if (text.indexOf(input) > -1) {
-            row.style.display = "";
-            count++;
-        } else {
-            row.style.display = "none";
-        }
-    });
-
-    document.getElementById("countInfo").innerText = "Toplam " + count + " Malzeme Gösteriliyor";
-}
-</script>
-
 {% endblock %}

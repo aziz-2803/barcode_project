@@ -3,36 +3,56 @@
 <div class="container-fluid">
     <h2 class="mb-4">➕ Yeni Malzeme Ekle</h2>
 
-    <form action="{{ url_for('main.add_item') }}" method="POST" class="card p-4 shadow-sm bg-white">
+    <form action="{{ url_for('main.add_parca') }}" method="POST" class="card p-4 shadow-sm bg-white">
 
         <div class="mb-3">
-            <label for="name" class="form-label">Malzeme Adı</label>
-            <input type="text" class="form-control" id="name" name="name" required placeholder="Örn: Vinç A1">
+            <label for="ekipman_turu" class="form-label">Ekipman Türü</label>
+            <input type="text" class="form-control" id="ekipman_turu" name="ekipman_turu" required placeholder="Örn: Polip">
         </div>
 
         <div class="mb-3">
-            <label for="location" class="form-label">Konum</label>
-            <input type="text" class="form-control" id="location" name="location" required placeholder="Örn: Depo Alanı">
+            <label for="model_adi" class="form-label">Model Adı</label>
+            <input type="text" class="form-control" id="model_adi" name="model_adi" required placeholder="Örn: SENNEBOGEN-835">
         </div>
 
         <div class="mb-3">
-            <label for="maintenance_date" class="form-label">Bakım Tarihi</label>
-            <input type="date" class="form-control" id="maintenance_date" name="maintenance_date" required>
+            <label for="konum" class="form-label">Konum</label>
+            <input type="text" class="form-control" id="konum" name="konum" required placeholder="Örn: 6.bölge">
         </div>
 
         <div class="mb-3">
-            <label for="status" class="form-label">Durum</label>
-            <select class="form-select" id="status" name="status" required>
+            <label for="bir_sonraki_bakim" class="form-label">Bir Sonraki Bakım Tarihi</label>
+            <input type="date" class="form-control" id="bir_sonraki_bakim" name="bir_sonraki_bakim">
+        </div>
+
+        <div class="mb-3">
+            <label for="durum" class="form-label">Durum</label>
+            <select class="form-select" id="durum" name="durum" required>
                 <option value="">Durum Seçiniz</option>
-                <option value="Çalışıyor">Çalışıyor</option>
+                <option value="Kullanıma hazır">Kullanıma Hazır</option>
                 <option value="Bakım Gerekli">Bakım Gerekli</option>
                 <option value="Arızalı">Arızalı</option>
             </select>
         </div>
 
+        <div class="mb-3">
+            <label for="kisa_aciklama" class="form-label">Açıklama / Not</label>
+            <textarea class="form-control" id="kisa_aciklama" name="kisa_aciklama" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="yuk_kapasitesi" class="form-label">Yük Kapasitesi</label>
+            <input type="text" class="form-control" id="yuk_kapasitesi" name="yuk_kapasitesi" placeholder="Örn: 3m3">
+        </div>
+
+        <div class="mb-3">
+            <label for="sorumlu_kisi" class="form-label">Sorumlu Kişi</label>
+            <input type="text" class="form-control" id="sorumlu_kisi" name="sorumlu_kisi" placeholder="Örn: Erdal Kesici">
+        </div>
+
         <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-primary">Kaydet</button>
-            <a href="{{ url_for('main.materials') }}" class="btn btn-secondary ms-2">İptal</a>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary ms-2">İptal</a>
         </div>
 
     </form>

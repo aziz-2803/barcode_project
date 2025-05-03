@@ -1,10 +1,10 @@
 <div class="sidebar">
     <div class="logo">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
         <h4 class="text-white mt-2">PORT</h4>
     </div>
     <a href="{{ url_for('main.dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
-    <a href="{{ url_for('main.materials') }}"><i class="fas fa-boxes me-2"></i> Malzemeler</a>
+    <a href="{{ url_for('main.malzeme_listesi') }}"><i class="fas fa-boxes me-2"></i> Malzemeler</a>
     <a href="{{ url_for('main.users') }}"><i class="fas fa-users me-2"></i> Kullanıcılar</a>
     <a href="{{ url_for('main.settings') }}"><i class="fas fa-cog me-2"></i> Ayarlar</a>
     <a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap</a>
