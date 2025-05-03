@@ -6,7 +6,7 @@ db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
@@ -17,6 +17,7 @@ class Settings(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     site_name = db.Column(db.String(100), default='PORT Yönetim Sistemi')
+    dark_mode = db.Column(db.Boolean, default=False)
 
 class Parca(db.Model):
     __tablename__ = 'parcalar'

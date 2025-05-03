@@ -3,10 +3,16 @@
 <div class="container-fluid mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">📦 Tüm Malzemeler</h4>
+        <h4 class="mb-0">📦 Tüm Ekipmanlar</h4>
         <a href="{{ url_for('main.add_parca') }}" class="btn btn-success">Yeni Malzeme Ekle</a>
     </div>
 
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('main.export_excel') }}" class="btn btn-success">
+            <i class="fas fa-file-excel me-1"></i> Excel'e Aktar
+        </a>
+    </div>
+    
     <div class="card shadow-sm">
         <div class="card-body table-responsive">
             <table class="table table-hover align-middle">

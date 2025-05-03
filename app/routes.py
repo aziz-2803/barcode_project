@@ -15,13 +15,15 @@ def dashboard():
     hazir = Parca.query.filter_by(durum='Kullanıma hazır').count()
     bakım = Parca.query.filter_by(durum='Bakım Gerekli').count()
     arizali = Parca.query.filter_by(durum='Arızalı').count()
-    return render_template('dashboard.html',
-                           parcalar=parcalar,
-                           hazir=hazir,
-                           bakım=bakım,
-                           arizali=arizali)
+    return render_template('dashboard.html', parcalar=parcalar, hazir=hazir, bakım=bakım, arizali=arizali)
 
-# ======== Malzeme Listesi ========
+# ======== Malzemeler ========
+@main.route('/materials')
+@login_required
+def materials():
+    parcalar = Parca.query.all()
+    return render_template('materials.html', parcalar=parcalar)
+
 @main.route('/malzemeler')
 @login_required
 def malzeme_listesi():
@@ -69,11 +71,11 @@ def add_parca():
         db.session.add(yeni_parca)
         db.session.commit()
         flash("Yeni parça başarıyla eklendi.", "success")
-        return redirect(url_for('main.malzeme_listesi'))
+        return redirect(url_for('main.materials'))
 
     return render_template('yeni.html')
 
-# ======== Parça Detay ve Basit Güncelleme ========
+# ======== Parça Detay ========
 @main.route('/detail/<int:parca_id>', methods=['GET', 'POST'])
 @login_required
 def detail(parca_id):
@@ -89,10 +91,10 @@ def detail(parca_id):
         parca.kisa_aciklama = request.form['kisa_aciklama']
         db.session.commit()
         flash('Parça başarıyla güncellendi.', 'success')
-        return redirect(url_for('main.malzeme_listesi'))
+        return redirect(url_for('main.materials'))
     return render_template('detail.html', parca=parca)
 
-# ======== Parça Tam Güncelleme ========
+# ======== Parça Düzenle ========
 @main.route('/edit/<int:parca_id>', methods=['GET', 'POST'])
 @login_required
 def edit(parca_id):
@@ -104,18 +106,15 @@ def edit(parca_id):
         parca.model_adi = request.form['model_adi']
         parca.konum = request.form['konum']
         parca.durum = request.form['durum']
-
         bir_sonraki_bakim = request.form.get('bir_sonraki_bakim')
         if bir_sonraki_bakim:
             try:
                 parca.bir_sonraki_bakim = datetime.strptime(bir_sonraki_bakim, '%Y-%m-%d').date()
             except:
                 flash("Tarih formatı geçersiz.", "danger")
-
         parca.kisa_aciklama = request.form['kisa_aciklama']
         parca.yuk_kapasitesi = request.form['yuk_kapasitesi']
         parca.sorumlu_kisi = request.form['sorumlu_kisi']
-
         db.session.commit()
         flash("Malzeme başarıyla güncellendi.", "success")
         return redirect(url_for('main.detail', parca_id=parca.id))
@@ -130,14 +129,14 @@ def delete_parca(parca_id):
     db.session.delete(parca)
     db.session.commit()
     flash('Parça başarıyla silindi.', 'success')
-    return redirect(url_for('main.malzeme_listesi'))
+    return redirect(url_for('main.materials'))
 
 # ======== Kullanıcılar ========
 @main.route('/users')
 @login_required
 def users():
     if current_user.role != 'Admin':
-        flash('ليس لديك صلاحية الوصول إلى هذه الصفحة.', 'danger')
+        flash('Bu sayfaya erişim yetkiniz yok.', 'danger')
         return redirect(url_for('main.dashboard'))
     all_users = User.query.all()
     return render_template('users.html', users=all_users)
@@ -146,7 +145,7 @@ def users():
 @login_required
 def add_user():
     if current_user.role != 'Admin':
-        flash('ليس لديك صلاحية الوصول إلى هذه الصفحة.', 'danger')
+        flash('Bu sayfaya erişim yetkiniz yok.', 'danger')
         return redirect(url_for('main.dashboard'))
     if request.method == 'POST':
         username = request.form['username']
@@ -156,7 +155,7 @@ def add_user():
         new_user = User(username=username, password=hashed, role=role)
         db.session.add(new_user)
         db.session.commit()
-        flash('تم إنشاء المستخدم بنجاح.', 'success')
+        flash('Kullanıcı başarıyla oluşturuldu.', 'success')
         return redirect(url_for('main.users'))
     return render_template('add_user.html')
 
@@ -164,15 +163,15 @@ def add_user():
 @login_required
 def delete_user(user_id):
     if current_user.role != 'Admin':
-        flash('ليس لديك صلاحية الوصول إلى هذه العملية.', 'danger')
+        flash('Bu işlemi yapma yetkiniz yok.', 'danger')
         return redirect(url_for('main.dashboard'))
     user = User.query.get_or_404(user_id)
     if user.id == current_user.id:
-        flash('لا يمكنك حذف حسابك الحالي!', 'warning')
+        flash('Kendi hesabınızı silemezsiniz!', 'warning')
         return redirect(url_for('main.users'))
     db.session.delete(user)
     db.session.commit()
-    flash('تم حذف المستخدم.', 'success')
+    flash('Kullanıcı silindi.', 'success')
     return redirect(url_for('main.users'))
 
 # ======== Ayarlar ========
@@ -181,23 +180,34 @@ def delete_user(user_id):
 def settings():
     setting = Settings.query.first()
     if request.method == 'POST':
+        # Dark Mode güncellemesi
+        if 'dark_mode' in request.form:
+            setting.dark_mode = True
+        else:
+            setting.dark_mode = False
+
+        # Şifre değişimi
         if 'old_password' in request.form and 'new_password' in request.form:
             old = request.form['old_password']
             new = request.form['new_password']
             confirm = request.form['confirm_password']
             if new != confirm:
-                flash('كلمات المرور الجديدة غير متطابقة.', 'danger')
+                flash('Yeni şifreler uyuşmuyor.', 'danger')
             elif not check_password_hash(current_user.password, old):
-                flash('كلمة المرور القديمة غير صحيحة.', 'danger')
+                flash('Eski şifre hatalı.', 'danger')
             else:
                 current_user.password = generate_password_hash(new)
                 db.session.commit()
-                flash('تم تغيير كلمة المرور بنجاح.', 'success')
-        else:
+                flash('Şifre başarıyla değiştirildi.', 'success')
+
+        # Site adı değişimi
+        elif 'site_name' in request.form:
             setting.site_name = request.form['site_name']
             db.session.commit()
-            flash('تم تحديث الإعدادات العامة.', 'success')
+            flash('Site adı güncellendi.', 'success')
+
         return redirect(url_for('main.settings'))
+
     return render_template('settings.html', setting=setting)
 
 # ======== Çıkış ========
@@ -206,3 +216,36 @@ def settings():
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+@main.route('/export_excel')
+@login_required
+def export_excel():
+    from flask import make_response
+    import pandas as pd
+    import io
+
+    parcalar = Parca.query.all()
+
+    data = []
+    for parca in parcalar:
+        data.append({
+            "Barkod": parca.barcode,
+            "Model Adı": parca.model_adi,
+            "Ekipman Türü": parca.ekipman_turu,
+            "Konum": parca.konum,
+            "Durum": parca.durum,
+            "Bir Sonraki Bakım": parca.bir_sonraki_bakim.strftime('%Y-%m-%d') if parca.bir_sonraki_bakim else '',
+            "Yük Kapasitesi": parca.yuk_kapasitesi,
+            "Sorumlu Kişi": parca.sorumlu_kisi,
+            "Açıklama / Not": parca.kisa_aciklama
+        })
+
+    df = pd.DataFrame(data)
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Parçalar')
+
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=malzemeler.xlsx"
+    response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    return response
