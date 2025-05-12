@@ -1,11 +1,28 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, make_response
 from flask_login import login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from .models import Parca, User, Settings
 from . import db
+import pandas as pd
+import io
 
 main = Blueprint('main', __name__)
+
+def parse_dongu(text):
+    if not text:
+        return None
+    text = text.lower()
+    if 'gün' in text:
+        return lambda d: d + relativedelta(days=int(text.split()[0]))
+    elif 'hafta' in text:
+        return lambda d: d + relativedelta(weeks=int(text.split()[0]))
+    elif 'ay' in text:
+        return lambda d: d + relativedelta(months=int(text.split()[0]))
+    elif 'yıl' in text:
+        return lambda d: d + relativedelta(years=int(text.split()[0]))
+    return None
 
 # ======== Dashboard ========
 @main.route('/')
@@ -15,7 +32,27 @@ def dashboard():
     hazir = Parca.query.filter_by(durum='Kullanıma hazır').count()
     bakım = Parca.query.filter_by(durum='Bakım Gerekli').count()
     arizali = Parca.query.filter_by(durum='Arızalı').count()
-    return render_template('dashboard.html', parcalar=parcalar, hazir=hazir, bakım=bakım, arizali=arizali)
+
+    bakim_yaklasan_sayisi = 0
+    today = datetime.today().date()
+
+    for parca in parcalar:
+        parca.bakim_durum = parca.durum
+        if parca.son_bakim_tarihi and parca.bakim_dongusu:
+            hesapla = parse_dongu(parca.bakim_dongusu)
+            if hesapla:
+                sonraki = hesapla(parca.son_bakim_tarihi)
+                if sonraki and (sonraki - today).days <= 7:
+                    parca.bakim_durum = "Bakım Yaklaşan"
+                    bakim_yaklasan_sayisi += 1
+
+    return render_template('dashboard.html',
+        parcalar=parcalar,
+        hazir=hazir,
+        bakım=bakım,
+        arizali=arizali,
+        bakim_yaklasanlar=bakim_yaklasan_sayisi
+    )
 
 # ======== Malzemeler ========
 @main.route('/materials')
@@ -39,6 +76,8 @@ def add_parca():
         model_adi = request.form['model_adi']
         konum = request.form['konum']
         bir_sonraki_bakim = request.form.get('bir_sonraki_bakim')
+        son_bakim_tarihi = request.form.get('son_bakim_tarihi')
+        bakim_dongusu = request.form.get('bakim_dongusu')
         durum = request.form['durum']
         kisa_aciklama = request.form.get('kisa_aciklama')
         yuk_kapasitesi = request.form.get('yuk_kapasitesi')
@@ -48,13 +87,11 @@ def add_parca():
         mevcut_sayisi = Parca.query.filter(Parca.barcode.like(f"{kod_taban}-%")).count() + 1
         barcode = f"{kod_taban}-{mevcut_sayisi:03d}"
 
-        bir_sonraki_bakim_tarihi = None
-        if bir_sonraki_bakim:
+        def parse_date(val):
             try:
-                bir_sonraki_bakim_tarihi = datetime.strptime(bir_sonraki_bakim, '%Y-%m-%d').date()
+                return datetime.strptime(val, '%Y-%m-%d').date() if val else None
             except:
-                flash("Geçersiz tarih formatı.", "danger")
-                return redirect(url_for('main.add_parca'))
+                return None
 
         yeni_parca = Parca(
             barcode=barcode,
@@ -62,7 +99,9 @@ def add_parca():
             ekipman_turu=ekipman_turu,
             konum=konum,
             durum=durum,
-            bir_sonraki_bakim=bir_sonraki_bakim_tarihi,
+            bir_sonraki_bakim=parse_date(bir_sonraki_bakim),
+            son_bakim_tarihi=parse_date(son_bakim_tarihi),
+            bakim_dongusu=bakim_dongusu,
             kisa_aciklama=kisa_aciklama,
             yuk_kapasitesi=yuk_kapasitesi,
             sorumlu_kisi=sorumlu_kisi
@@ -83,15 +122,13 @@ def detail(parca_id):
     if request.method == 'POST':
         parca.konum = request.form['konum']
         parca.durum = request.form['durum']
-        bir_sonraki_bakim_str = request.form.get('bir_sonraki_bakim')
-        if bir_sonraki_bakim_str:
-            parca.bir_sonraki_bakim = datetime.strptime(bir_sonraki_bakim_str, '%Y-%m-%d').date()
-        else:
-            parca.bir_sonraki_bakim = None
         parca.kisa_aciklama = request.form['kisa_aciklama']
+        parca.bir_sonraki_bakim = datetime.strptime(request.form.get('bir_sonraki_bakim'), '%Y-%m-%d') if request.form.get('bir_sonraki_bakim') else None
+        parca.son_bakim_tarihi = datetime.strptime(request.form.get('son_bakim_tarihi'), '%Y-%m-%d') if request.form.get('son_bakim_tarihi') else None
+        parca.bakim_dongusu = request.form.get('bakim_dongusu')
         db.session.commit()
         flash('Parça başarıyla güncellendi.', 'success')
-        return redirect(url_for('main.materials'))
+        return redirect(url_for('main.detail', parca_id=parca.id))
     return render_template('detail.html', parca=parca)
 
 # ======== Parça Düzenle ========
@@ -99,26 +136,21 @@ def detail(parca_id):
 @login_required
 def edit(parca_id):
     parca = Parca.query.get_or_404(parca_id)
-
     if request.method == 'POST':
         parca.barcode = request.form['barcode']
         parca.ekipman_turu = request.form['ekipman_turu']
         parca.model_adi = request.form['model_adi']
         parca.konum = request.form['konum']
         parca.durum = request.form['durum']
-        bir_sonraki_bakim = request.form.get('bir_sonraki_bakim')
-        if bir_sonraki_bakim:
-            try:
-                parca.bir_sonraki_bakim = datetime.strptime(bir_sonraki_bakim, '%Y-%m-%d').date()
-            except:
-                flash("Tarih formatı geçersiz.", "danger")
+        parca.bir_sonraki_bakim = datetime.strptime(request.form.get('bir_sonraki_bakim'), '%Y-%m-%d') if request.form.get('bir_sonraki_bakim') else None
+        parca.son_bakim_tarihi = datetime.strptime(request.form.get('son_bakim_tarihi'), '%Y-%m-%d') if request.form.get('son_bakim_tarihi') else None
+        parca.bakim_dongusu = request.form.get('bakim_dongusu')
         parca.kisa_aciklama = request.form['kisa_aciklama']
         parca.yuk_kapasitesi = request.form['yuk_kapasitesi']
         parca.sorumlu_kisi = request.form['sorumlu_kisi']
         db.session.commit()
         flash("Malzeme başarıyla güncellendi.", "success")
         return redirect(url_for('main.detail', parca_id=parca.id))
-
     return render_template('edit.html', parca=parca)
 
 # ======== Parça Sil ========
@@ -180,13 +212,11 @@ def delete_user(user_id):
 def settings():
     setting = Settings.query.first()
     if request.method == 'POST':
-        # Dark Mode güncellemesi
         if 'dark_mode' in request.form:
             setting.dark_mode = True
         else:
             setting.dark_mode = False
 
-        # Şifre değişimi
         if 'old_password' in request.form and 'new_password' in request.form:
             old = request.form['old_password']
             new = request.form['new_password']
@@ -199,8 +229,6 @@ def settings():
                 current_user.password = generate_password_hash(new)
                 db.session.commit()
                 flash('Şifre başarıyla değiştirildi.', 'success')
-
-        # Site adı değişimi
         elif 'site_name' in request.form:
             setting.site_name = request.form['site_name']
             db.session.commit()
@@ -216,15 +244,12 @@ def settings():
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+
+# ======== Excel Dışa Aktar ========
 @main.route('/export_excel')
 @login_required
 def export_excel():
-    from flask import make_response
-    import pandas as pd
-    import io
-
     parcalar = Parca.query.all()
-
     data = []
     for parca in parcalar:
         data.append({
@@ -234,13 +259,14 @@ def export_excel():
             "Konum": parca.konum,
             "Durum": parca.durum,
             "Bir Sonraki Bakım": parca.bir_sonraki_bakim.strftime('%Y-%m-%d') if parca.bir_sonraki_bakim else '',
+            "Son Bakım Tarihi": parca.son_bakim_tarihi.strftime('%Y-%m-%d') if parca.son_bakim_tarihi else '',
+            "Bakım Döngüsü": parca.bakim_dongusu or '',
             "Yük Kapasitesi": parca.yuk_kapasitesi,
             "Sorumlu Kişi": parca.sorumlu_kisi,
             "Açıklama / Not": parca.kisa_aciklama
         })
 
     df = pd.DataFrame(data)
-
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Parçalar')

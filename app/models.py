@@ -29,7 +29,21 @@ class Parca(db.Model):
     konum = db.Column(db.String(100), nullable=False)
     durum = db.Column(db.String(50), nullable=False)
     bir_sonraki_bakim = db.Column(db.Date, nullable=True)
+    son_bakim_tarihi = db.Column(db.Date, nullable=True)
+    bakim_dongusu = db.Column(db.String(50), nullable=True)
     kisa_aciklama = db.Column(db.Text, nullable=True)
     yuk_kapasitesi = db.Column(db.String(50), nullable=True)
     sorumlu_kisi = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # ارتباط مع سجل الصيانة
+    bakim_kayitlari = db.relationship('BakimKaydi', backref='parca', lazy=True)
+
+class BakimKaydi(db.Model):
+    __tablename__ = 'bakim_kaydi'
+
+    id = db.Column(db.Integer, primary_key=True)
+    parca_id = db.Column(db.Integer, db.ForeignKey('parcalar.id'), nullable=False)
+    tarih = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    aciklama = db.Column(db.Text, nullable=True)
+    teknisyen = db.Column(db.String(100), nullable=True)

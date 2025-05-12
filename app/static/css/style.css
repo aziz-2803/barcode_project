@@ -73,9 +73,9 @@ body {
 
 /* ==== STATS CARDS ==== */
 .stats-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
     margin: 40px 0;
 }
 
@@ -595,3 +595,4 @@ body {
 .cancel-btn:hover {
     background-color: #aaa;
 }
+

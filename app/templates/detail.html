@@ -11,6 +11,8 @@
       <p><strong>Yük Kapasitesi:</strong> {{ parca.yuk_kapasitesi }}</p>
       <p><strong>Sorumlu Kişi:</strong> {{ parca.sorumlu_kisi }}</p>
       <p><strong>Bir Sonraki Bakım:</strong> {{ parca.bir_sonraki_bakim }}</p>
+      <p><strong>Son Bakım Tarihi:</strong> {{ parca.son_bakim_tarihi }}</p>
+      <p><strong>Bakım Döngüsü:</strong> {{ parca.bakim_dongusu }}</p>
       <p><strong>Durum:</strong> 
         {% if parca.durum == 'Kullanıma hazır' %}
           <span class="badge bg-success text-white">{{ parca.durum }}</span>

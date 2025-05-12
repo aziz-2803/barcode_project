@@ -4,7 +4,7 @@
 
     <!-- Sayaç Kartları -->
     <div class="row mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="all" style="cursor: pointer;">
                 <div class="card-body bg-white">
                     <i class="fas fa-layer-group fa-2x text-primary mb-2"></i>
@@ -13,7 +13,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Kullanıma hazır" style="cursor: pointer;">
                 <div class="card-body bg-success bg-opacity-10">
                     <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Bakım Gerekli" style="cursor: pointer;">
                 <div class="card-body bg-warning bg-opacity-10">
                     <i class="fas fa-tools fa-2x text-warning mb-2"></i>
@@ -31,12 +31,21 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Arızalı" style="cursor: pointer;">
                 <div class="card-body bg-danger bg-opacity-10">
                     <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
                     <h6 class="text-danger">Arızalı</h6>
                     <h5>{{ arizali }} adet</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Bakım Yaklaşan" style="cursor: pointer;">
+                <div class="card-body bg-info bg-opacity-10">
+                    <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                    <h6 class="text-info">Bakımı Yaklaşanlar</h6>
+                    <h5>{{ bakim_yaklasanlar }} adet</h5>
                 </div>
             </div>
         </div>
@@ -56,11 +65,13 @@
             </thead>
             <tbody>
                 {% for parca in parcalar %}
-                <tr data-durum="{{ parca.durum }}">
+                <tr data-durum="{{ parca.bakim_durum }}">
                     <td>{{ parca.model_adi }}</td>
                     <td>{{ parca.konum }}</td>
                     <td>
-                        {% if parca.durum == 'Kullanıma hazır' %}
+                        {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
+                            <span class="badge bg-info text-white">Bakımı Yaklaşan</span>
+                        {% elif parca.durum == 'Kullanıma hazır' %}
                             <span class="badge bg-success">{{ parca.durum }}</span>
                         {% elif parca.durum == 'Bakım Gerekli' %}
                             <span class="badge bg-warning text-dark">{{ parca.durum }}</span>

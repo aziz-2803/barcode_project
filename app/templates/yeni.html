@@ -26,6 +26,26 @@
         </div>
 
         <div class="mb-3">
+            <label for="son_bakim_tarihi" class="form-label">Son Bakım Tarihi</label>
+            <input type="date" class="form-control" id="son_bakim_tarihi" name="son_bakim_tarihi">
+        </div>
+
+        <div class="mb-3">
+            <label for="bakim_dongusu" class="form-label">Bakım Döngüsü</label>
+            <input list="donguList" class="form-control" id="bakim_dongusu" name="bakim_dongusu" placeholder="Örn: 2 ay, 1 yıl, 30 gün">
+            <datalist id="donguList">
+                <option value="7 gün">
+                <option value="15 gün">
+                <option value="1 ay">
+                <option value="2 ay">
+                <option value="3 ay">
+                <option value="6 ay">
+                <option value="1 yıl">
+                <option value="2 yıl">
+            </datalist>
+        </div>        
+
+        <div class="mb-3">
             <label for="durum" class="form-label">Durum</label>
             <select class="form-select" id="durum" name="durum" required>
                 <option value="">Durum Seçiniz</option>
