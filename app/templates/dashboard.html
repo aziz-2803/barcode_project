@@ -1,104 +1,104 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid px-4">
 
-    <!-- Sayaç Kartları -->
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="all" style="cursor: pointer;">
-                <div class="card-body bg-white">
-                    <i class="fas fa-layer-group fa-2x text-primary mb-2"></i>
-                    <h6 class="text-primary">Tüm Malzemeler</h6>
-                    <h5>{{ parcalar|length }} adet</h5>
-                </div>
+    <!-- بطاقات العدادات -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-lg-2">
+            <div class="stat-card filter-card" data-filter="all">
+                <i class="fas fa-layer-group text-primary"></i>
+                <h6>Tüm Malzemeler</h6>
+                <h5>{{ parcalar|length }} adet</h5>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Kullanıma hazır" style="cursor: pointer;">
-                <div class="card-body bg-success bg-opacity-10">
-                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                    <h6 class="text-success">Kullanıma Hazır</h6>
-                    <h5>{{ hazir }} adet</h5>
-                </div>
+        <div class="col-md-3 col-lg-2">
+            <div class="stat-card filter-card" data-filter="Kullanıma hazır">
+                <i class="fas fa-check-circle text-success"></i>
+                <h6>Kullanıma Hazır</h6>
+                <h5>{{ hazir }} adet</h5>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Bakım Gerekli" style="cursor: pointer;">
-                <div class="card-body bg-warning bg-opacity-10">
-                    <i class="fas fa-tools fa-2x text-warning mb-2"></i>
-                    <h6 class="text-warning">Bakım Gerekli</h6>
-                    <h5>{{ bakım }} adet</h5>
-                </div>
+        <div class="col-md-3 col-lg-2">
+            <div class="stat-card filter-card" data-filter="Bakım Gerekli">
+                <i class="fas fa-tools text-warning"></i>
+                <h6>Bakım Gerekli</h6>
+                <h5>{{ bakım }} adet</h5>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Arızalı" style="cursor: pointer;">
-                <div class="card-body bg-danger bg-opacity-10">
-                    <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
-                    <h6 class="text-danger">Arızalı</h6>
-                    <h5>{{ arizali }} adet</h5>
-                </div>
+        <div class="col-md-3 col-lg-2">
+            <div class="stat-card filter-card" data-filter="Arızalı">
+                <i class="fas fa-exclamation-triangle text-danger"></i>
+                <h6>Arızalı</h6>
+                <h5>{{ arizali }} adet</h5>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card text-center shadow-sm rounded-4 filter-card" data-filter="Bakım Yaklaşan" style="cursor: pointer;">
-                <div class="card-body bg-info bg-opacity-10">
-                    <i class="fas fa-clock fa-2x text-info mb-2"></i>
-                    <h6 class="text-info">Bakımı Yaklaşanlar</h6>
-                    <h5>{{ bakim_yaklasanlar }} adet</h5>
-                </div>
+        <div class="col-md-3 col-lg-2">
+            <div class="stat-card filter-card" data-filter="Bakım Yaklaşan">
+                <i class="fas fa-clock text-info"></i>
+                <h6>Bakımı Yaklaşan</h6>
+                <h5>{{ bakim_yaklasanlar }} adet</h5>
             </div>
         </div>
     </div>
 
-    <!-- Liste Tablosu -->
-    <h5 class="mb-3">Toplam {{ parcalar|length }} Malzeme Gösteriliyor</h5>
-    <div class="table-responsive">
-        <table class="table table-bordered bg-white shadow-sm align-middle" id="malzemeTable">
-            <thead class="table-light">
-                <tr>
-                    <th>Adı</th>
-                    <th>Konum</th>
-                    <th>Durum</th>
-                    <th>Detay</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for parca in parcalar %}
-                <tr data-durum="{{ parca.bakim_durum }}">
-                    <td>{{ parca.model_adi }}</td>
-                    <td>{{ parca.konum }}</td>
-                    <td>
-                        {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
-                            <span class="badge bg-info text-white">Bakımı Yaklaşan</span>
-                        {% elif parca.durum == 'Kullanıma hazır' %}
-                            <span class="badge bg-success">{{ parca.durum }}</span>
-                        {% elif parca.durum == 'Bakım Gerekli' %}
-                            <span class="badge bg-warning text-dark">{{ parca.durum }}</span>
-                        {% elif parca.durum == 'Arızalı' %}
-                            <span class="badge bg-danger">{{ parca.durum }}</span>
-                        {% else %}
-                            {{ parca.durum }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="btn btn-sm btn-outline-primary">Detay</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- جدول القطع -->
+    <div class="items-section mt-4">
+        <div class="items-header mb-3 d-flex justify-content-between align-items-center">
+            <h2 class="mb-0 text-primary">Malzeme Listesi</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle items-table" id="malzemeTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Adı</th>
+                        <th>Konum</th>
+                        <th>Durum</th>
+                        <th>Detay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parca in parcalar %}
+                    <tr data-durum="{{ parca.durum }}" data-bakim="{{ parca.bakim_durum }}">
+                        <td>{{ parca.model_adi }}</td>
+                        <td>{{ parca.konum }}</td>
+                        <td>
+                            {% if parca.durum == 'Kullanıma hazır' %}
+                                <span class="badge bg-success">Kullanıma Hazır</span>
+                            {% elif parca.durum == 'Bakım Gerekli' %}
+                                <span class="badge bg-warning text-dark">Bakım Gerekli</span>
+                            {% elif parca.durum == 'Arızalı' %}
+                                <span class="badge bg-danger">Arızalı</span>
+                            {% endif %}
+                            {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
+                                <span class="badge bg-info text-white ms-1">Bakımı Yaklaşan</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="detail-btn">Detay</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- JS: Kartlarla filtreleme -->
+<!-- فلترة القطع -->
 <script>
     document.querySelectorAll('.filter-card').forEach(card => {
         card.addEventListener('click', () => {
             const filter = card.getAttribute('data-filter');
             document.querySelectorAll('#malzemeTable tbody tr').forEach(row => {
                 const durum = row.getAttribute('data-durum');
-                row.style.display = (filter === 'all' || durum === filter) ? '' : 'none';
+                const bakim = row.getAttribute('data-bakim');
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else if (filter === 'Bakım Yaklaşan') {
+                    row.style.display = bakim === 'Bakım Yaklaşan' ? '' : 'none';
+                } else {
+                    row.style.display = durum === filter ? '' : 'none';
+                }
             });
         });
     });
