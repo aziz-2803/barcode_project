@@ -230,3 +230,256 @@ body {
     font-weight: bold;
     margin-bottom: 20px;
 }
+
+/* خلفية ناعمة للموقع بالكامل */
+body {
+    background-color: #f9f6f2;
+}
+
+/* تحسين عنوان القسم */
+.section-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #3c4858;
+    letter-spacing: 0.5px;
+}
+
+/* تنسيق رأس الجدول */
+.table-head-custom {
+    background-color: #f4f1eb !important;
+    color: #444 !important;
+}
+
+/* تأثير بسيط على الجدول */
+.items-table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.items-table td,
+.items-table th {
+    vertical-align: middle;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+/* ظل خفيف حول الجدول */
+.items-section {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* توازن المسافات العلوية والسفلية */
+.container-fluid {
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+/* أيقونة دائرية داخل البطاقة */
+.icon-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.icon-circle i {
+    font-size: 20px;
+    color: #333;
+}
+
+/* تحسين نص البطاقة */
+.card-title {
+    font-size: 14px;
+    color: #555;
+    margin: 6px 0 2px 0;
+    font-weight: 600;
+}
+.card-count {
+    font-size: 18px;
+    font-weight: bold;
+    color: #003366;
+    margin: 0;
+}
+
+/* تحسين زر التفاصيل */
+.detail-btn {
+    background: #0056b3;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+.detail-btn:hover {
+    background: #003f88;
+}
+
+/* ==== لوحة التحكم: تنسيق فخم ومنظم ==== */
+
+/* الحاوية العامة */
+.dashboard-wrapper {
+    padding: 30px 40px;
+    background-color: #f9f6f2;
+}
+
+/* شبكة البطاقات العلوية */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* كل بطاقة */
+.stat-card-new {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+.stat-card-new:hover {
+    transform: translateY(-4px);
+}
+
+/* أيقونة داخل دائرة */
+.icon-wrapper {
+    background-color: #f1f3f9;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon-wrapper i {
+    font-size: 20px;
+    color: #333;
+}
+
+/* معلومات البطاقة */
+.stat-info {
+    text-align: center;
+    margin-top: 12px;
+}
+.stat-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+.stat-count {
+    font-size: 20px;
+    font-weight: bold;
+    color: #003366;
+    margin-top: 2px;
+}
+
+/* قسم البيانات */
+.data-section {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* عنوان القسم */
+.data-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #003366;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* جدول المواد */
+.table-wrapper {
+    overflow-x: auto;
+}
+.malzeme-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+.malzeme-table thead {
+    background-color: #f3f4f8;
+    font-size: 14px;
+    color: #333;
+}
+.malzeme-table th {
+    padding: 12px 16px;
+    text-align: left;
+}
+.malzeme-table td {
+    background-color: #fff;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #333;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+.malzeme-table tr {
+    transition: background-color 0.2s ease;
+}
+.malzeme-table tr:hover td {
+    background-color: #f9f9fb;
+}
+
+/* بادجات الحالة */
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 20px;
+}
+.badge-green {
+    background-color: #baf2c1;
+    color: #165a30;
+}
+.badge-yellow {
+    background-color: #fff3b0;
+    color: #665300;
+}
+.badge-red {
+    background-color: #f8c8c8;
+    color: #a82323;
+}
+.badge-cyan {
+    background-color: #d3f4f9;
+    color: #0d4f56;
+}
+
+/* زر Detay */
+.detail-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #0056b3;
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.detail-btn:hover {
+    background-color: #003d80;
+}
+.detail-btn i {
+    font-size: 14px;
+}

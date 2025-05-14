@@ -1,54 +1,34 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="container-fluid px-4">
-
-    <!-- بطاقات العدادات -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3 col-lg-2">
-            <div class="stat-card filter-card" data-filter="all">
-                <i class="fas fa-layer-group text-primary"></i>
-                <h6>Tüm Malzemeler</h6>
-                <h5>{{ parcalar|length }} adet</h5>
+<div class="dashboard-wrapper">
+    <!-- العناوين العلوية -->
+    <div class="stats-grid">
+        {% set cards = [
+            ('Tüm Malzemeler', parcalar|length, 'fa-layer-group', 'soft-blue', 'all'),
+            ('Kullanıma Hazır', hazir, 'fa-check-circle', 'soft-green', 'Kullanıma hazır'),
+            ('Bakım Gerekli', bakım, 'fa-tools', 'soft-yellow', 'Bakım Gerekli'),
+            ('Arızalı', arizali, 'fa-exclamation-triangle', 'soft-red', 'Arızalı'),
+            ('Bakımı Yaklaşan', bakim_yaklasanlar, 'fa-clock', 'soft-cyan', 'Bakım Yaklaşan')
+        ] %}
+        {% for title, count, icon, color, filter in cards %}
+        <div class="stat-card-new {{ color }} filter-card" data-filter="{{ filter }}">
+            <div class="icon-wrapper">
+                <i class="fas {{ icon }}"></i>
+            </div>
+            <div class="stat-info">
+                <p class="stat-title">{{ title }}</p>
+                <p class="stat-count">{{ count }} adet</p>
             </div>
         </div>
-        <div class="col-md-3 col-lg-2">
-            <div class="stat-card filter-card" data-filter="Kullanıma hazır">
-                <i class="fas fa-check-circle text-success"></i>
-                <h6>Kullanıma Hazır</h6>
-                <h5>{{ hazir }} adet</h5>
-            </div>
-        </div>
-        <div class="col-md-3 col-lg-2">
-            <div class="stat-card filter-card" data-filter="Bakım Gerekli">
-                <i class="fas fa-tools text-warning"></i>
-                <h6>Bakım Gerekli</h6>
-                <h5>{{ bakım }} adet</h5>
-            </div>
-        </div>
-        <div class="col-md-3 col-lg-2">
-            <div class="stat-card filter-card" data-filter="Arızalı">
-                <i class="fas fa-exclamation-triangle text-danger"></i>
-                <h6>Arızalı</h6>
-                <h5>{{ arizali }} adet</h5>
-            </div>
-        </div>
-        <div class="col-md-3 col-lg-2">
-            <div class="stat-card filter-card" data-filter="Bakım Yaklaşan">
-                <i class="fas fa-clock text-info"></i>
-                <h6>Bakımı Yaklaşan</h6>
-                <h5>{{ bakim_yaklasanlar }} adet</h5>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- جدول القطع -->
-    <div class="items-section mt-4">
-        <div class="items-header mb-3 d-flex justify-content-between align-items-center">
-            <h2 class="mb-0 text-primary">Malzeme Listesi</h2>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle items-table" id="malzemeTable">
-                <thead class="table-light">
+    <!-- جدول البيانات -->
+    <div class="data-section">
+        <h2 class="data-title"><i class="fas fa-boxes"></i> Malzeme Listesi</h2>
+        <div class="table-wrapper">
+            <table class="malzeme-table" id="malzemeTable">
+                <thead>
                     <tr>
                         <th>Adı</th>
                         <th>Konum</th>
@@ -63,18 +43,20 @@
                         <td>{{ parca.konum }}</td>
                         <td>
                             {% if parca.durum == 'Kullanıma hazır' %}
-                                <span class="badge bg-success">Kullanıma Hazır</span>
+                                <span class="status-badge badge-green">Kullanıma Hazır</span>
                             {% elif parca.durum == 'Bakım Gerekli' %}
-                                <span class="badge bg-warning text-dark">Bakım Gerekli</span>
+                                <span class="status-badge badge-yellow">Bakım Gerekli</span>
                             {% elif parca.durum == 'Arızalı' %}
-                                <span class="badge bg-danger">Arızalı</span>
+                                <span class="status-badge badge-red">Arızalı</span>
                             {% endif %}
                             {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
-                                <span class="badge bg-info text-white ms-1">Bakımı Yaklaşan</span>
+                                <span class="status-badge badge-cyan ms-1">Bakımı Yaklaşan</span>
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="detail-btn">Detay</a>
+                            <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="detail-btn">
+                                <i class="fas fa-eye"></i> Detay
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
