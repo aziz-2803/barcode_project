@@ -483,3 +483,55 @@ body {
 .detail-btn i {
     font-size: 14px;
 }
+
+/* ألوان متطابقة مع حالات القطع */
+
+.soft-blue {
+    background-color: #e0e8f9; /* Tüm Malzemeler */
+}
+.soft-blue .icon-wrapper {
+    background-color: #d0def0;
+}
+.soft-blue .icon-wrapper i {
+    color: #003366;
+}
+
+.soft-green {
+    background-color: #d4f5df; /* Kullanıma Hazır */
+}
+.soft-green .icon-wrapper {
+    background-color: #c2efd1;
+}
+.soft-green .icon-wrapper i {
+    color: #165a30;
+}
+
+.soft-yellow {
+    background-color: #fff3b0; /* Bakım Gerekli */
+}
+.soft-yellow .icon-wrapper {
+    background-color: #ffe88a;
+}
+.soft-yellow .icon-wrapper i {
+    color: #665300;
+}
+
+.soft-red {
+    background-color: #f8c8c8; /* Arızalı */
+}
+.soft-red .icon-wrapper {
+    background-color: #f5b1b1;
+}
+.soft-red .icon-wrapper i {
+    color: #a82323;
+}
+
+.soft-cyan {
+    background-color: #d3f4f9; /* Bakımı Yaklaşan */
+}
+.soft-cyan .icon-wrapper {
+    background-color: #b6eaf1;
+}
+.soft-cyan .icon-wrapper i {
+    color: #0d4f56;
+}

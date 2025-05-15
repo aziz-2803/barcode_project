@@ -1,11 +1,11 @@
 <div class="sidebar">
     <div class="sidebar-logo">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-        <h2>PORT</h2>
+        <h2>Yeşilyurt Bakım Takip Sistemi</h2>
     </div>
     <ul class="sidebar-menu">
         <li><a href="{{ url_for('main.dashboard') }}" class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}">
-            <i class="fas fa-home"></i> Dashboard
+            <i class="fas fa-home"></i> Anasayfa
         </a></li>
         <li><a href="{{ url_for('main.malzeme_listesi') }}" class="{% if request.endpoint == 'main.malzeme_listesi' %}active{% endif %}">
             <i class="fas fa-boxes"></i> Ekipmanlar
