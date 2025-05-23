@@ -1,29 +1,28 @@
-from app import create_app
-from app.models import db, Parca
+import os
+from app import db, create_app
+from app.models import Parca
 import barcode
 from barcode.writer import ImageWriter
-import os
 
-# إنشاء التطبيق
+# 1. إنشاء التطبيق وتفعيل السياق
 app = create_app()
 
-# تأكد أن مجلد barcodes موجود
-barcode_folder = os.path.join(os.path.dirname(__file__), 'barcodes')
-os.makedirs(barcode_folder, exist_ok=True)
-
-# داخل السياق
 with app.app_context():
+    # 2. إنشاء مجلد لحفظ الباركودات
+    os.makedirs("generated_barcodes", exist_ok=True)
+
+    # 3. استرجاع جميع القطع
     parcalar = Parca.query.all()
-    
+
     for parca in parcalar:
-        # توليد رابط الصفحة الخاص بهذه القطعة
-        link = f"http://192.168.1.124:5000/detail/{parca.id}"
+        value = parca.barcode
+        if not value:
+            continue
 
-        # اسم ملف الصورة
-        filename = os.path.join(barcode_folder, f"{parca.barcode}.png")
+        file_path = os.path.join("generated_barcodes", f"{value}.png")
 
-        # توليد الباركود
-        code128 = barcode.get('code128', link, writer=ImageWriter())
-        code128.save(filename.replace('.png', ''))  # يحذف .png لأن المكتبة تضيفها تلقائيًا
+        # 4. توليد الباركود وحفظه
+        code128 = barcode.get("code128", value, writer=ImageWriter())
+        code128.save(file_path)
 
-        print(f"Barcod oluşturuldu: {filename}")
+        print(f"✅ Barkod oluşturuldu: {file_path}")

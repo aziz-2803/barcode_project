@@ -31,12 +31,14 @@ class Parca(db.Model):
     bir_sonraki_bakim = db.Column(db.Date, nullable=True)
     son_bakim_tarihi = db.Column(db.Date, nullable=True)
     bakim_dongusu = db.Column(db.String(50), nullable=True)
+    bakim_durum = db.Column(db.String(50), nullable=True)  # ✅ تمت إضافته
+    notlar = db.Column(db.Text, nullable=True)              # ✅ تمت إضافته
     kisa_aciklama = db.Column(db.Text, nullable=True)
     yuk_kapasitesi = db.Column(db.String(50), nullable=True)
     sorumlu_kisi = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # ارتباط مع سجل الصيانة
+    # علاقة مع سجل الصيانة
     bakim_kayitlari = db.relationship('BakimKaydi', backref='parca', lazy=True)
 
 class BakimKaydi(db.Model):
