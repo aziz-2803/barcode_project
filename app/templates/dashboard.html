@@ -8,7 +8,7 @@
             ('Kullanıma Hazır', hazir, 'fa-check-circle', 'soft-green', 'Kullanıma hazır'),
             ('Bakım Gerekli', bakım, 'fa-tools', 'soft-yellow', 'Bakım Gerekli'),
             ('Arızalı', arizali, 'fa-exclamation-triangle', 'soft-red', 'Arızalı'),
-            ('Bakımı Yaklaşan', bakim_yaklasanlar, 'fa-clock', 'soft-cyan', 'Bakım Yaklaşan')
+            ('Bakımı Yaklaşan', bakim_yaklasanlar, 'fa-clock', 'soft-cyan', 'yaklasan')
         ] %}
         {% for title, count, icon, color, filter in cards %}
         <div class="stat-card-new {{ color }} filter-card" data-filter="{{ filter }}">
@@ -44,13 +44,13 @@
                         <td>
                             {% if parca.durum == 'Kullanıma hazır' %}
                                 <span class="status-badge badge-green">Kullanıma Hazır</span>
+                                {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
+                                    <span class="status-badge badge-cyan ms-1">Bakımı Yaklaşan</span>
+                                {% endif %}
                             {% elif parca.durum == 'Bakım Gerekli' %}
                                 <span class="status-badge badge-yellow">Bakım Gerekli</span>
                             {% elif parca.durum == 'Arızalı' %}
                                 <span class="status-badge badge-red">Arızalı</span>
-                            {% endif %}
-                            {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
-                                <span class="status-badge badge-cyan ms-1">Bakımı Yaklaşan</span>
                             {% endif %}
                         </td>
                         <td>
@@ -76,8 +76,8 @@
                 const bakim = row.getAttribute('data-bakim');
                 if (filter === 'all') {
                     row.style.display = '';
-                } else if (filter === 'Bakım Yaklaşan') {
-                    row.style.display = bakim === 'Bakım Yaklaşan' ? '' : 'none';
+                } else if (filter === 'yaklasan') {
+                    row.style.display = (bakim === 'Bakım Yaklaşan' && durum === 'Kullanıma hazır') ? '' : 'none';
                 } else {
                     row.style.display = durum === filter ? '' : 'none';
                 }

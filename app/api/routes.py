@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from app.models import Parca
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 api = Blueprint('api', __name__)
 
@@ -11,6 +12,14 @@ def get_parca(parca_id):
     if not parca:
         return jsonify({'error': 'Parça bulunamadı'}), 404
 
+    bir_sonraki_bakim = parca.bir_sonraki_bakim
+    if not bir_sonraki_bakim and parca.son_bakim_tarihi and parca.bakim_dongusu:
+        try:
+            ay_sayisi = int(parca.bakim_dongusu.strip())
+            bir_sonraki_bakim = parca.son_bakim_tarihi + relativedelta(months=ay_sayisi)
+        except:
+            bir_sonraki_bakim = None
+
     return jsonify({
         'id': parca.id,
         'barcode': parca.barcode,
@@ -18,7 +27,7 @@ def get_parca(parca_id):
         'model_adi': parca.model_adi,
         'konum': parca.konum,
         'durum': parca.durum,
-        'bir_sonraki_bakim': _to_date_str(parca.bir_sonraki_bakim),
+        'bir_sonraki_bakim': _to_date_str(bir_sonraki_bakim),
         'son_bakim_tarihi': _to_date_str(parca.son_bakim_tarihi),
         'created_at': _to_date_str(parca.created_at),
         'bakim_dongusu': parca.bakim_dongusu,
@@ -36,6 +45,14 @@ def get_parca_by_barcode(barcode):
     if not parca:
         return jsonify({'error': 'Parça bulunamadı'}), 404
 
+    bir_sonraki_bakim = parca.bir_sonraki_bakim
+    if not bir_sonraki_bakim and parca.son_bakim_tarihi and parca.bakim_dongusu:
+        try:
+            ay_sayisi = int(parca.bakim_dongusu.strip())
+            bir_sonraki_bakim = parca.son_bakim_tarihi + relativedelta(months=ay_sayisi)
+        except:
+            bir_sonraki_bakim = None
+
     return jsonify({
         'id': parca.id,
         'barcode': parca.barcode,
@@ -43,13 +60,13 @@ def get_parca_by_barcode(barcode):
         'model_adi': parca.model_adi,
         'konum': parca.konum,
         'durum': parca.durum,
-        'bir_sonraki_bakim': _to_date_str(parca.bir_sonraki_bakim),
+        'bir_sonraki_bakim': _to_date_str(bir_sonraki_bakim),
         'son_bakim_tarihi': _to_date_str(parca.son_bakim_tarihi),
         'created_at': _to_date_str(parca.created_at),
         'bakim_dongusu': parca.bakim_dongusu,
         'notlar': parca.notlar
     })
-    
+
 # ========= دالة آمنة لتحويل التواريخ =========
 def _to_date_str(value):
     try:

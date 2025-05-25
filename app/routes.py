@@ -39,12 +39,15 @@ def dashboard():
     for parca in parcalar:
         parca.bakim_durum = parca.durum
         if parca.son_bakim_tarihi and parca.bakim_dongusu:
-            hesapla = parse_dongu(parca.bakim_dongusu)
-            if hesapla:
-                sonraki = hesapla(parca.son_bakim_tarihi)
-                if sonraki and (sonraki - today).days <= 7:
+            try:
+                ay = int(parca.bakim_dongusu)
+                sonraki = parca.son_bakim_tarihi + relativedelta(months=ay)
+                parca.bir_sonraki_bakim = sonraki
+                if (sonraki - today).days <= 7:
                     parca.bakim_durum = "Bakım Yaklaşan"
                     bakim_yaklasan_sayisi += 1
+            except:
+                pass
 
     return render_template('dashboard.html',
         parcalar=parcalar,

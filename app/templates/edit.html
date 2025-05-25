@@ -29,27 +29,13 @@
         </select>
       </div>
       <div class="col-md-6 mb-3">
-        <label for="bir_sonraki_bakim">Bir Sonraki Bakım</label>
-        <input type="date" class="form-control" name="bir_sonraki_bakim" value="{{ parca.bir_sonraki_bakim }}">
-      </div>
-      <div class="col-md-6 mb-3">
         <label for="son_bakim_tarihi">Son Bakım Tarihi</label>
         <input type="date" class="form-control" name="son_bakim_tarihi" value="{{ parca.son_bakim_tarihi }}">
       </div>
       <div class="col-md-6 mb-3">
-        <label for="bakim_dongusu">Bakım Döngüsü</label>
-        <input list="donguList" class="form-control" name="bakim_dongusu" value="{{ parca.bakim_dongusu }}" placeholder="Örn: 2 ay, 1 yıl, 30 gün">
-        <datalist id="donguList">
-            <option value="7 gün">
-            <option value="15 gün">
-            <option value="1 ay">
-            <option value="2 ay">
-            <option value="3 ay">
-            <option value="6 ay">
-            <option value="1 yıl">
-            <option value="2 yıl">
-        </datalist>
-    </div>    
+        <label for="bakim_dongusu">Bakım Döngüsü (ay)</label>
+        <input type="number" class="form-control" name="bakim_dongusu" value="{{ parca.bakim_dongusu }}" min="1" placeholder="örn: 1">
+      </div>
       <div class="col-md-6 mb-3">
         <label for="yuk_kapasitesi">Yük Kapasitesi</label>
         <input type="text" class="form-control" name="yuk_kapasitesi" value="{{ parca.yuk_kapasitesi }}">
