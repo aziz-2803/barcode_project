@@ -145,9 +145,17 @@ def edit(parca_id):
         parca.model_adi = request.form['model_adi']
         parca.konum = request.form['konum']
         parca.durum = request.form['durum']
-        parca.bir_sonraki_bakim = datetime.strptime(request.form.get('bir_sonraki_bakim'), '%Y-%m-%d') if request.form.get('bir_sonraki_bakim') else None
         parca.son_bakim_tarihi = datetime.strptime(request.form.get('son_bakim_tarihi'), '%Y-%m-%d') if request.form.get('son_bakim_tarihi') else None
         parca.bakim_dongusu = request.form.get('bakim_dongusu')
+        try:
+            if parca.son_bakim_tarihi and parca.bakim_dongusu:
+                ay = int(parca.bakim_dongusu)
+                parca.bir_sonraki_bakim = parca.son_bakim_tarihi + relativedelta(months=ay)
+            else:
+                parca.bir_sonraki_bakim = None
+        except:
+            parca.bir_sonraki_bakim = None
+
         parca.kisa_aciklama = request.form['kisa_aciklama']
         parca.yuk_kapasitesi = request.form['yuk_kapasitesi']
         parca.sorumlu_kisi = request.form['sorumlu_kisi']
