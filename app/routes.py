@@ -29,25 +29,41 @@ def parse_dongu(text):
 @login_required
 def dashboard():
     parcalar = Parca.query.all()
-    hazir = Parca.query.filter_by(durum='Kullanıma hazır').count()
-    bakım = Parca.query.filter_by(durum='Bakım Gerekli').count()
-    arizali = Parca.query.filter_by(durum='Arızalı').count()
 
+    hazir = 0
+    bakım = 0
+    arizali = 0
     bakim_yaklasan_sayisi = 0
     today = datetime.today().date()
 
     for parca in parcalar:
-        parca.bakim_durum = parca.durum
+        parca.bakim_durum = None  # لتحديد حالة "Bakım Yaklaşan"
         if parca.son_bakim_tarihi and parca.bakim_dongusu:
             try:
                 ay = int(parca.bakim_dongusu)
                 sonraki = parca.son_bakim_tarihi + relativedelta(months=ay)
                 parca.bir_sonraki_bakim = sonraki
-                if (sonraki - today).days <= 7:
+                kalan_gun = (sonraki - today).days
+
+                if kalan_gun < 0:
+                    # إذا تجاوز موعد الصيانة → تصنيفها مباشرةً كـ Bakım Gerekli
+                    parca.durum = "Bakım Gerekli"
+                    parca.bakim_durum = None
+                elif 0 <= kalan_gun <= 7:
                     parca.bakim_durum = "Bakım Yaklaşan"
-                    bakim_yaklasan_sayisi += 1
             except:
                 pass
+
+        # العدّ حسب الحالة الحالية بعد التعديلات
+        if parca.durum == "Kullanıma hazır":
+            hazir += 1
+        elif parca.durum == "Bakım Gerekli":
+            bakım += 1
+        elif parca.durum == "Arızalı":
+            arizali += 1
+
+        if parca.bakim_durum == "Bakım Yaklaşan":
+            bakim_yaklasan_sayisi += 1
 
     return render_template('dashboard.html',
         parcalar=parcalar,

@@ -1,5 +1,6 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.models import Parca
+from app import db
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -34,11 +35,10 @@ def get_parca(parca_id):
         'bakim_durumu': parca.bakim_durum,
         'kisa_aciklama': parca.kisa_aciklama,
         'yuk_kapasitesi': parca.yuk_kapasitesi,
-        'sorumlu_kisi': parca.sorumlu_kisi,
-        'notlar': parca.notlar
+        'sorumlu_kisi': parca.sorumlu_kisi
     })
 
-# ====== البحث باستخدام barcode (لـ Flutter) ======
+# ====== GET: جلب البيانات باستخدام باركود (لتطبيق Flutter) ======
 @api.route('/api/barcode/<string:barcode>', methods=['GET'])
 def get_parca_by_barcode(barcode):
     parca = Parca.query.filter_by(barcode=barcode).first()
@@ -64,10 +64,36 @@ def get_parca_by_barcode(barcode):
         'son_bakim_tarihi': _to_date_str(parca.son_bakim_tarihi),
         'created_at': _to_date_str(parca.created_at),
         'bakim_dongusu': parca.bakim_dongusu,
-        'notlar': parca.notlar
+        'sorumlu_kisi': parca.sorumlu_kisi,
+        'kisa_aciklama': parca.kisa_aciklama
     })
 
-# ========= دالة آمنة لتحويل التواريخ =========
+# ====== PUT: تعديل قطعة باستخدام الباركود من تطبيق Flutter ======
+@api.route('/api/barcode/<string:barcode>', methods=['PUT'])
+def update_parca_by_barcode(barcode):
+    parca = Parca.query.filter_by(barcode=barcode).first()
+    if not parca:
+        return jsonify({'error': 'Parça bulunamadı'}), 404
+
+    data = request.get_json()
+
+    parca.durum = data.get('durum', parca.durum)
+    parca.konum = data.get('konum', parca.konum)
+    parca.sorumlu_kisi = data.get('sorumlu_kisi', parca.sorumlu_kisi)
+    parca.kisa_aciklama = data.get('kisa_aciklama', parca.kisa_aciklama)
+
+    # تاريخ آخر صيانة
+    son_bakim_str = data.get('son_bakim_tarihi')
+    if son_bakim_str:
+        try:
+            parca.son_bakim_tarihi = datetime.fromisoformat(son_bakim_str)
+        except:
+            pass
+
+    db.session.commit()
+    return jsonify({'message': 'Parça başarıyla güncellendi'})
+
+# ========= دالة آمنة لتحويل التواريخ إلى نص =========
 def _to_date_str(value):
     try:
         if isinstance(value, datetime):

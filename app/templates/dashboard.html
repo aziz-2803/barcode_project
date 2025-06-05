@@ -46,6 +46,8 @@
                                 <span class="status-badge badge-green">Kullanıma Hazır</span>
                                 {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
                                     <span class="status-badge badge-cyan ms-1">Bakımı Yaklaşan</span>
+                                {% elif parca.bakim_durum == 'Bakım Gerekli' %}
+                                    <span class="status-badge badge-yellow ms-1">Bakım Gerekli</span>
                                 {% endif %}
                             {% elif parca.durum == 'Bakım Gerekli' %}
                                 <span class="status-badge badge-yellow">Bakım Gerekli</span>
@@ -77,7 +79,7 @@
                 if (filter === 'all') {
                     row.style.display = '';
                 } else if (filter === 'yaklasan') {
-                    row.style.display = (bakim === 'Bakım Yaklaşan' && durum === 'Kullanıma hazır') ? '' : 'none';
+                    row.style.display = (bakim === 'Bakım Yaklaşan') ? '' : 'none';
                 } else {
                     row.style.display = durum === filter ? '' : 'none';
                 }
