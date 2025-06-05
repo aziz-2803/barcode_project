@@ -37,7 +37,7 @@ def dashboard():
     today = datetime.today().date()
 
     for parca in parcalar:
-        parca.bakim_durum = None  # لتحديد حالة "Bakım Yaklaşan"
+        parca.bakim_durum = None  # لتحديد "Bakım Yaklaşan"
         if parca.son_bakim_tarihi and parca.bakim_dongusu:
             try:
                 ay = int(parca.bakim_dongusu)
@@ -46,15 +46,12 @@ def dashboard():
                 kalan_gun = (sonraki - today).days
 
                 if kalan_gun < 0:
-                    # إذا تجاوز موعد الصيانة → تصنيفها مباشرةً كـ Bakım Gerekli
                     parca.durum = "Bakım Gerekli"
-                    parca.bakim_durum = None
-                elif 0 <= kalan_gun <= 7:
+                elif kalan_gun <= 30 and parca.durum == "Kullanıma hazır":
                     parca.bakim_durum = "Bakım Yaklaşan"
             except:
                 pass
 
-        # العدّ حسب الحالة الحالية بعد التعديلات
         if parca.durum == "Kullanıma hazır":
             hazir += 1
         elif parca.durum == "Bakım Gerekli":
@@ -65,7 +62,8 @@ def dashboard():
         if parca.bakim_durum == "Bakım Yaklaşan":
             bakim_yaklasan_sayisi += 1
 
-    return render_template('dashboard.html',
+    return render_template(
+        'dashboard.html',
         parcalar=parcalar,
         hazir=hazir,
         bakım=bakım,
@@ -134,50 +132,84 @@ def add_parca():
     return render_template('yeni.html')
 
 # ======== Parça Detay ========
-@main.route('/detail/<int:parca_id>', methods=['GET', 'POST'])
+@main.route('/detail/<int:parca_id>')
 @login_required
 def detail(parca_id):
     parca = Parca.query.get_or_404(parca_id)
-    if request.method == 'POST':
-        parca.konum = request.form['konum']
-        parca.durum = request.form['durum']
-        parca.kisa_aciklama = request.form['kisa_aciklama']
-        parca.bir_sonraki_bakim = datetime.strptime(request.form.get('bir_sonraki_bakim'), '%Y-%m-%d') if request.form.get('bir_sonraki_bakim') else None
-        parca.son_bakim_tarihi = datetime.strptime(request.form.get('son_bakim_tarihi'), '%Y-%m-%d') if request.form.get('son_bakim_tarihi') else None
-        parca.bakim_dongusu = request.form.get('bakim_dongusu')
-        db.session.commit()
-        flash('Parça başarıyla güncellendi.', 'success')
-        return redirect(url_for('main.detail', parca_id=parca.id))
-    return render_template('detail.html', parca=parca)
+
+    # حساب bir_sonraki_bakim
+    today = datetime.today().date()
+    if parca.son_bakim_tarihi and parca.bakim_dongusu:
+        try:
+            ay = int(parca.bakim_dongusu)
+            parca.bir_sonraki_bakim = parca.son_bakim_tarihi + relativedelta(months=ay)
+        except:
+            parca.bir_sonraki_bakim = None
+    else:
+        parca.bir_sonraki_bakim = None
+
+    # الحساب التلقائي للحالة إن لم تكن Arızalı
+    if parca.durum != 'Arızalı' and parca.bir_sonraki_bakim:
+        kalan = (parca.bir_sonraki_bakim - today).days
+        if kalan < 0:
+            parca.durum = 'Bakım Gerekli'
+        elif kalan <= 7:
+            parca.durum = 'Bakım Yaklaşan'
+        else:
+            parca.durum = 'Kullanıma hazır'
+
+    return render_template('detail.html', parca=parca, today=today)
 
 # ======== Parça Düzenle ========
-@main.route('/edit/<int:parca_id>', methods=['GET', 'POST'])
+@main.route('/parca/<int:parca_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit(parca_id):
     parca = Parca.query.get_or_404(parca_id)
+
     if request.method == 'POST':
         parca.barcode = request.form['barcode']
         parca.ekipman_turu = request.form['ekipman_turu']
         parca.model_adi = request.form['model_adi']
         parca.konum = request.form['konum']
-        parca.durum = request.form['durum']
-        parca.son_bakim_tarihi = datetime.strptime(request.form.get('son_bakim_tarihi'), '%Y-%m-%d') if request.form.get('son_bakim_tarihi') else None
-        parca.bakim_dongusu = request.form.get('bakim_dongusu')
-        try:
-            if parca.son_bakim_tarihi and parca.bakim_dongusu:
-                ay = int(parca.bakim_dongusu)
-                parca.bir_sonraki_bakim = parca.son_bakim_tarihi + relativedelta(months=ay)
-            else:
-                parca.bir_sonraki_bakim = None
-        except:
-            parca.bir_sonraki_bakim = None
-
+        parca.sorumlu_kisi = request.form['sorumlu_kisi']
         parca.kisa_aciklama = request.form['kisa_aciklama']
         parca.yuk_kapasitesi = request.form['yuk_kapasitesi']
-        parca.sorumlu_kisi = request.form['sorumlu_kisi']
+
+        # التاريخ
+        son_bakim_str = request.form['son_bakim_tarihi']
+        parca.son_bakim_tarihi = datetime.strptime(son_bakim_str, '%Y-%m-%d').date() if son_bakim_str else None
+
+        # دورة الصيانة
+        bakim_dongusu = request.form.get('bakim_dongusu')
+        parca.bakim_dongusu = int(bakim_dongusu) if bakim_dongusu else None
+
+        # حساب التاريخ القادم
+        if parca.son_bakim_tarihi and parca.bakim_dongusu:
+            parca.bir_sonraki_bakim = parca.son_bakim_tarihi + relativedelta(months=+parca.bakim_dongusu)
+        else:
+            parca.bir_sonraki_bakim = None
+
+        # حالة العطل
+        if 'arizali_mi' in request.form:
+            parca.durum = 'Arızalı'
+        else:
+            # حساب الحالة تلقائيًا
+            bugun = datetime.now().date()
+            if parca.bir_sonraki_bakim:
+                kalan = (parca.bir_sonraki_bakim - bugun).days
+                if kalan < 0:
+                    parca.durum = 'Bakım Gerekli'
+                elif kalan <= 7:
+                    parca.durum = 'Kullanıma hazır'  # جاهزة ولكن قريبة أيضًا
+                else:
+                    parca.durum = 'Kullanıma hazır'
+            else:
+                parca.durum = 'Kullanıma hazır'
+
         db.session.commit()
-        flash("Malzeme başarıyla güncellendi.", "success")
+        flash("Parça başarıyla güncellendi.", "success")
         return redirect(url_for('main.detail', parca_id=parca.id))
+
     return render_template('edit.html', parca=parca)
 
 # ======== Parça Sil ========

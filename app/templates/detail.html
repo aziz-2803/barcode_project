@@ -1,33 +1,54 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-  <h2 class="mb-4"><i class="fas fa-clipboard-list"></i> Malzeme Detayları</h2>
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <p><strong>Barkod:</strong> {{ parca.barcode }}</p>
-      <p><strong>Ekipman Türü:</strong> {{ parca.ekipman_turu }}</p>
-      <p><strong>Model Adı:</strong> {{ parca.model_adi }}</p>
-      <p><strong>Konum:</strong> {{ parca.konum }}</p>
-      <p><strong>Yük Kapasitesi:</strong> {{ parca.yuk_kapasitesi }}</p>
-      <p><strong>Sorumlu Kişi:</strong> {{ parca.sorumlu_kisi }}</p>
-      <p><strong>Bir Sonraki Bakım:</strong> {{ parca.bir_sonraki_bakim }}</p>
-      <p><strong>Son Bakım Tarihi:</strong> {{ parca.son_bakim_tarihi }}</p>
-      <p><strong>Bakım Döngüsü (ay):</strong> {{ parca.bakim_dongusu }}</p>
-      <p><strong>Durum:</strong> 
-        {% if parca.durum == 'Kullanıma hazır' %}
-          <span class="badge bg-success text-white">{{ parca.durum }}</span>
-        {% elif parca.durum == 'Bakım Gerekli' %}
-          <span class="badge bg-warning text-dark">{{ parca.durum }}</span>
-        {% else %}
-          <span class="badge bg-danger text-white">{{ parca.durum }}</span>
-        {% endif %}
-      </p>
-      <p><strong>Açıklama / Not:</strong><br>{{ parca.kisa_aciklama }}</p>
-      <form method="POST" action="{{ url_for('main.delete_parca', parca_id=parca.id) }}" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
-        <a href="{{ url_for('main.edit', parca_id=parca.id) }}" class="btn btn-primary">Düzenle</a>
-        <button type="submit" class="btn btn-danger">Sil</button>
-        <a href="{{ url_for('main.malzeme_listesi') }}" class="btn btn-secondary">Geri Dön</a>
+  <h2 class="mb-4"><i class="fas fa-info-circle"></i> Malzeme Detayları</h2>
+
+  <div class="card shadow p-4" style="font-size: 1.1rem;">
+    <div class="row">
+      <!-- Sol Sütun -->
+      <div class="col-md-6 mb-3">
+        <p><strong><i class="fas fa-barcode me-1"></i> Barkod:</strong> {{ parca.barcode }}</p>
+        <p><strong><i class="fas fa-tag me-1"></i> Model Adı:</strong> {{ parca.model_adi }}</p>
+        <p><strong><i class="fas fa-weight-hanging me-1"></i> Yük Kapasitesi:</strong> {{ parca.yuk_kapasitesi }}</p>
+        <p><strong><i class="fas fa-calendar-check me-1"></i> Son Bakım Tarihi:</strong> {{ parca.son_bakim_tarihi }}</p>
+        <p><strong><i class="fas fa-calendar-plus me-1"></i> Bir Sonraki Bakım:</strong> {{ parca.bir_sonraki_bakim }}</p>
+        <p><strong><i class="fas fa-sticky-note me-1"></i> Açıklama / Not:</strong><br>{{ parca.kisa_aciklama }}</p>
+      </div>
+
+      <!-- Sağ Sütun -->
+      <div class="col-md-6 mb-3">
+        <p><strong><i class="fas fa-tools me-1"></i> Ekipman Türü:</strong> {{ parca.ekipman_turu }}</p>
+        <p><strong><i class="fas fa-map-marker-alt me-1"></i> Konum:</strong> {{ parca.konum }}</p>
+        <p><strong><i class="fas fa-user me-1"></i> Sorumlu Kişi:</strong> {{ parca.sorumlu_kisi }}</p>
+        <p><strong><i class="fas fa-sync-alt me-1"></i> Bakım Döngüsü (ay):</strong> {{ parca.bakim_dongusu }}</p>
+
+        <!-- Durum Alanı -->
+        <p><strong><i class="fas fa-exclamation-circle me-1"></i> Durum:</strong>
+          {% if parca.durum == 'Arızalı' %}
+            <span class="badge bg-danger text-white">Arızalı</span>
+          {% else %}
+            {% set kalan_gun = (parca.bir_sonraki_bakim - today).days %}
+            {% if kalan_gun < 0 %}
+              <span class="badge bg-warning text-dark">Bakım Gerekli</span>
+              <div class="text-muted small mt-1">Bakım tarihi geçmiş. Sistem tarafından otomatik belirlenmiştir.</div>
+            {% elif kalan_gun <= 7 %}
+              <span class="badge bg-info text-white">Bakımı Yaklaşan</span>
+              <div class="text-muted small mt-1">Bakım tarihi yaklaşıyor. Sistem tarafından otomatik belirlenmiştir.</div>
+            {% else %}
+              <span class="badge bg-success text-white">Kullanıma Hazır</span>
+            {% endif %}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Butonlar -->
+    <div class="mt-4">
+      <a href="{{ url_for('main.edit', parca_id=parca.id) }}" class="btn btn-primary me-2"><i class="fas fa-edit"></i> Düzenle</a>
+      <form method="POST" action="{{ url_for('main.delete_parca', parca_id=parca.id) }}" class="d-inline" onsubmit="return confirm('Silmek istediğinize emin misiniz?')">
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Sil</button>
       </form>
+      <a href="{{ url_for('main.malzeme_listesi') }}" class="btn btn-secondary ms-2"><i class="fas fa-arrow-left"></i> Geri Dön</a>
     </div>
   </div>
 </div>

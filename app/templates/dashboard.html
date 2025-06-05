@@ -38,7 +38,7 @@
                 </thead>
                 <tbody>
                     {% for parca in parcalar %}
-                    <tr data-durum="{{ parca.durum }}" data-bakim="{{ parca.bakim_durum }}">
+                    <tr data-durum="{{ parca.durum }}" data-bakim="{{ 'Bakım Yaklaşan' if parca.bakim_durum == 'Bakım Yaklaşan' else '' }}">
                         <td>{{ parca.model_adi }}</td>
                         <td>{{ parca.konum }}</td>
                         <td>
@@ -46,8 +46,6 @@
                                 <span class="status-badge badge-green">Kullanıma Hazır</span>
                                 {% if parca.bakim_durum == 'Bakım Yaklaşan' %}
                                     <span class="status-badge badge-cyan ms-1">Bakımı Yaklaşan</span>
-                                {% elif parca.bakim_durum == 'Bakım Gerekli' %}
-                                    <span class="status-badge badge-yellow ms-1">Bakım Gerekli</span>
                                 {% endif %}
                             {% elif parca.durum == 'Bakım Gerekli' %}
                                 <span class="status-badge badge-yellow">Bakım Gerekli</span>

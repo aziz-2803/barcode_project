@@ -20,20 +20,14 @@
         <label for="konum">Konum</label>
         <input type="text" class="form-control" name="konum" value="{{ parca.konum }}" required>
       </div>
-      <div class="col-md-6 mb-3">
-        <label for="durum">Durum</label>
-        <select class="form-control" name="durum" required>
-          <option value="Kullanıma hazır" {% if parca.durum == 'Kullanıma hazır' %}selected{% endif %}>Kullanıma Hazır</option>
-          <option value="Arızalı" {% if parca.durum == 'Arızalı' %}selected{% endif %}>Arızalı</option>
-        </select>
-      </div>
+
       <div class="col-md-6 mb-3">
         <label for="son_bakim_tarihi">Son Bakım Tarihi</label>
         <input type="date" class="form-control" name="son_bakim_tarihi" value="{{ parca.son_bakim_tarihi }}">
       </div>
       <div class="col-md-6 mb-3">
         <label for="bakim_dongusu">Bakım Döngüsü (ay)</label>
-        <input type="number" class="form-control" name="bakim_dongusu" value="{{ parca.bakim_dongusu }}" placeholder="Örn: 1, 3, 6" min="1">
+        <input type="number" class="form-control" name="bakim_dongusu" value="{{ parca.bakim_dongusu }}" min="1">
       </div>
       <div class="col-md-6 mb-3">
         <label for="bir_sonraki_bakim">Bir Sonraki Bakım</label>
@@ -47,11 +41,24 @@
         <label for="sorumlu_kisi">Sorumlu Kişi</label>
         <input type="text" class="form-control" name="sorumlu_kisi" value="{{ parca.sorumlu_kisi }}">
       </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="arizali_checkbox">Durum</label><br>
+        <div class="form-check mt-1">
+          <input class="form-check-input" type="checkbox" name="arizali_mi" id="arizali_mi" {% if parca.durum == 'Arızalı' %}checked{% endif %}>
+          <label class="form-check-label" for="arizali_mi">
+            Bu parça arızalı mı?
+          </label>
+        </div>
+        <small class="text-muted d-block mt-1">* Diğer durumlar sistem tarafından otomatik belirlenir.</small>
+      </div>
+
       <div class="col-12 mb-3">
         <label for="kisa_aciklama">Açıklama / Not</label>
         <textarea class="form-control" name="kisa_aciklama" rows="3">{{ parca.kisa_aciklama }}</textarea>
       </div>
     </div>
+
     <button type="submit" class="btn btn-success">Kaydet</button>
     <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="btn btn-secondary">İptal</a>
   </form>
