@@ -8,6 +8,10 @@ from . import db
 import pandas as pd
 import io
 
+import os
+import barcode as barcode_module
+from barcode.writer import ImageWriter
+
 main = Blueprint('main', __name__)
 
 def parse_dongu(text):
@@ -28,8 +32,10 @@ def parse_dongu(text):
 @main.route('/')
 @login_required
 def dashboard():
-    parcalar = Parca.query.all()
+    setting = Settings.query.first()
+    uyari_gun = setting.bakim_yaklasma_gunu if setting and setting.bakim_yaklasma_gunu else 30
 
+    parcalar = Parca.query.all()
     hazir = 0
     bakım = 0
     arizali = 0
@@ -37,7 +43,7 @@ def dashboard():
     today = datetime.today().date()
 
     for parca in parcalar:
-        parca.bakim_durum = None  # لتحديد "Bakım Yaklaşan"
+        parca.bakim_durum = None
         if parca.son_bakim_tarihi and parca.bakim_dongusu:
             try:
                 ay = int(parca.bakim_dongusu)
@@ -47,7 +53,7 @@ def dashboard():
 
                 if kalan_gun < 0:
                     parca.durum = "Bakım Gerekli"
-                elif kalan_gun <= 30 and parca.durum == "Kullanıma hazır":
+                elif kalan_gun <= uyari_gun and parca.durum == "Kullanıma hazır":
                     parca.bakim_durum = "Bakım Yaklaşan"
             except:
                 pass
@@ -72,12 +78,6 @@ def dashboard():
     )
 
 # ======== Malzemeler ========
-@main.route('/materials')
-@login_required
-def materials():
-    parcalar = Parca.query.all()
-    return render_template('materials.html', parcalar=parcalar)
-
 @main.route('/malzemeler')
 @login_required
 def malzeme_listesi():
@@ -104,6 +104,11 @@ def add_parca():
         mevcut_sayisi = Parca.query.filter(Parca.barcode.like(f"{kod_taban}-%")).count() + 1
         barcode = f"{kod_taban}-{mevcut_sayisi:03d}"
 
+        # ✅ Barkod görselini oluştur ve kaydet
+        barcode_path = os.path.join("generated_barcodes", f"{barcode}.png")
+        barcode_img = barcode_module.Code128(barcode, writer=ImageWriter())
+        barcode_img.save(barcode_path)
+
         def parse_date(val):
             try:
                 return datetime.strptime(val, '%Y-%m-%d').date() if val else None
@@ -127,18 +132,23 @@ def add_parca():
         db.session.add(yeni_parca)
         db.session.commit()
         flash("Yeni parça başarıyla eklendi.", "success")
-        return redirect(url_for('main.materials'))
+        return redirect(url_for('main.malzeme_listesi'))
 
     return render_template('yeni.html')
+
 
 # ======== Parça Detay ========
 @main.route('/detail/<int:parca_id>')
 @login_required
 def detail(parca_id):
     parca = Parca.query.get_or_404(parca_id)
-
-    # حساب bir_sonraki_bakim
     today = datetime.today().date()
+
+    # جلب إعدادات النظام
+    setting = Settings.query.first()
+    uyari_gun = setting.bakim_yaklasma_gunu if setting and setting.bakim_yaklasma_gunu is not None else 30
+
+    # حساب bir_sonraki_bakim تلقائيًا من son_bakim_tarihi + bakim_dongusu
     if parca.son_bakim_tarihi and parca.bakim_dongusu:
         try:
             ay = int(parca.bakim_dongusu)
@@ -148,12 +158,12 @@ def detail(parca_id):
     else:
         parca.bir_sonraki_bakim = None
 
-    # الحساب التلقائي للحالة إن لم تكن Arızalı
+    # تحديد الحالة تلقائيًا (إلا إذا كانت Arızalı)
     if parca.durum != 'Arızalı' and parca.bir_sonraki_bakim:
         kalan = (parca.bir_sonraki_bakim - today).days
         if kalan < 0:
             parca.durum = 'Bakım Gerekli'
-        elif kalan <= 7:
+        elif kalan <= uyari_gun:
             parca.durum = 'Bakım Yaklaşan'
         else:
             parca.durum = 'Kullanıma hazır'
@@ -220,7 +230,7 @@ def delete_parca(parca_id):
     db.session.delete(parca)
     db.session.commit()
     flash('Parça başarıyla silindi.', 'success')
-    return redirect(url_for('main.materials'))
+    return redirect(url_for('main.malzeme_listesi'))
 
 # ======== Kullanıcılar ========
 @main.route('/users')
@@ -271,11 +281,10 @@ def delete_user(user_id):
 def settings():
     setting = Settings.query.first()
     if request.method == 'POST':
-        if 'dark_mode' in request.form:
-            setting.dark_mode = True
-        else:
-            setting.dark_mode = False
+        # الوضع الداكن
+        setting.dark_mode = 'dark_mode' in request.form
 
+        # تغيير كلمة المرور
         if 'old_password' in request.form and 'new_password' in request.form:
             old = request.form['old_password']
             new = request.form['new_password']
@@ -288,10 +297,18 @@ def settings():
                 current_user.password = generate_password_hash(new)
                 db.session.commit()
                 flash('Şifre başarıyla değiştirildi.', 'success')
-        elif 'site_name' in request.form:
-            setting.site_name = request.form['site_name']
+
+        # اسم الموقع وعدد أيام التنبيه
+        elif 'site_name' in request.form or 'bakim_yaklasma_gunu' in request.form:
+            if 'site_name' in request.form:
+                setting.site_name = request.form['site_name']
+            if 'bakim_yaklasma_gunu' in request.form:
+                try:
+                    setting.bakim_yaklasma_gunu = int(request.form['bakim_yaklasma_gunu'])
+                except ValueError:
+                    setting.bakim_yaklasma_gunu = 30
             db.session.commit()
-            flash('Site adı güncellendi.', 'success')
+            flash('Ayarlar güncellendi.', 'success')
 
         return redirect(url_for('main.settings'))
 
@@ -320,17 +337,37 @@ def export_excel():
             "Bir Sonraki Bakım": parca.bir_sonraki_bakim.strftime('%Y-%m-%d') if parca.bir_sonraki_bakim else '',
             "Son Bakım Tarihi": parca.son_bakim_tarihi.strftime('%Y-%m-%d') if parca.son_bakim_tarihi else '',
             "Bakım Döngüsü": parca.bakim_dongusu or '',
-            "Yük Kapasitesi": parca.yuk_kapasitesi,
-            "Sorumlu Kişi": parca.sorumlu_kisi,
-            "Açıklama / Not": parca.kisa_aciklama
+            "Yük Kapasitesi": parca.yuk_kapasitesi or '',
+            "Sorumlu Kişi": parca.sorumlu_kisi or '',
+            "Açıklama / Not": parca.kisa_aciklama or ''
         })
 
     df = pd.DataFrame(data)
     output = io.BytesIO()
+
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Parçalar')
+        workbook = writer.book
+        worksheet = writer.sheets['Parçalar']
+
+        # تنسيق العناوين
+        header_format = workbook.add_format({
+            'bold': True,
+            'text_wrap': True,
+            'valign': 'middle',
+            'align': 'center',
+            'fg_color': '#D9D9D9',
+            'border': 1
+        })
+
+        # تطبيق التنسيق على رؤوس الأعمدة
+        for col_num, value in enumerate(df.columns.values):
+            worksheet.write(0, col_num, value, header_format)
+            column_width = max(df[value].astype(str).map(len).max(), len(value)) + 4
+            worksheet.set_column(col_num, col_num, column_width)
 
     response = make_response(output.getvalue())
-    response.headers["Content-Disposition"] = "attachment; filename=malzemeler.xlsx"
+    response.headers["Content-Disposition"] = "attachment; filename=Ekipmanlar.xlsx"
     response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     return response
+

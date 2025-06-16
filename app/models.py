@@ -18,6 +18,7 @@ class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_name = db.Column(db.String(100), default='PORT Yönetim Sistemi')
     dark_mode = db.Column(db.Boolean, default=False)
+    bakim_yaklasma_gunu = db.Column(db.Integer, default=7)  # ✅ تمت الإضافة هنا
 
 class Parca(db.Model):
     __tablename__ = 'parcalar'

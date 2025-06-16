@@ -1,8 +1,11 @@
 <div class="sidebar">
     <div class="sidebar-logo">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-        <h2>Yeşilyurt Bakım Takip Sistemi</h2>
+
+        <!-- ✅ استخدام اسم الموقع من الإعدادات -->
+        <h2>{{ setting.site_name if setting else "Bakım Takip Sistemi" }}</h2>
     </div>
+
     <ul class="sidebar-menu">
         <li><a href="{{ url_for('main.dashboard') }}" class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}">
             <i class="fas fa-home"></i> Anasayfa

@@ -3,74 +3,65 @@
 <div class="container-fluid">
     <h2 class="mb-4">➕ Yeni Malzeme Ekle</h2>
 
-    <form action="{{ url_for('main.add_parca') }}" method="POST" class="card p-4 shadow-sm bg-white">
+    <form action="{{ url_for('main.add_parca') }}" method="POST" class="card p-4 shadow-sm bg-white rounded-4">
 
-        <div class="mb-3">
-            <label for="ekipman_turu" class="form-label">Ekipman Türü</label>
-            <input type="text" class="form-control" id="ekipman_turu" name="ekipman_turu" required placeholder="Örn: Polip">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="ekipman_turu" class="form-label">Ekipman Türü</label>
+                <input type="text" class="form-control" id="ekipman_turu" name="ekipman_turu" required placeholder="Örn: Polip">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="model_adi" class="form-label">Model Adı</label>
+                <input type="text" class="form-control" id="model_adi" name="model_adi" required placeholder="Örn: SENNEBOGEN-835">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="konum" class="form-label">Konum</label>
+                <input type="text" class="form-control" id="konum" name="konum" required placeholder="Örn: 6.bölge">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="son_bakim_tarihi" class="form-label">Son Bakım Tarihi</label>
+                <input type="date" class="form-control" id="son_bakim_tarihi" name="son_bakim_tarihi">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="bakim_dongusu" class="form-label">Bakım Döngüsü (ay olarak)</label>
+                <input type="number" class="form-control" id="bakim_dongusu" name="bakim_dongusu" min="1" placeholder="Örn: 2">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="sorumlu_kisi" class="form-label">Sorumlu Kişi</label>
+                <input type="text" class="form-control" id="sorumlu_kisi" name="sorumlu_kisi" placeholder="Örn: Erdal Kesici">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="yuk_kapasitesi" class="form-label">Yük Kapasitesi</label>
+                <input type="text" class="form-control" id="yuk_kapasitesi" name="yuk_kapasitesi" placeholder="Örn: 3m3">
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="kisa_aciklama" class="form-label">Açıklama / Not</label>
+                <textarea class="form-control" id="kisa_aciklama" name="kisa_aciklama" rows="3" placeholder="Varsa açıklama giriniz..."></textarea>
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <label for="notlar" class="form-label">İç Notlar (Opsiyonel)</label>
+                <textarea class="form-control" id="notlar" name="notlar" rows="2" placeholder="Sadece iç kullanım için notlar..."></textarea>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="durum" class="form-label">Durum</label>
+                <select class="form-select" id="durum" name="durum" required>
+                    <option value="Kullanıma hazır">Kullanıma Hazır</option>
+                    <option value="Arızalı">Arızalı</option>
+                    <!-- Bakım Gerekli ve Yaklaşan sistem tarafından otomatik hesaplanıyor -->
+                </select>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label for="model_adi" class="form-label">Model Adı</label>
-            <input type="text" class="form-control" id="model_adi" name="model_adi" required placeholder="Örn: SENNEBOGEN-835">
-        </div>
-
-        <div class="mb-3">
-            <label for="konum" class="form-label">Konum</label>
-            <input type="text" class="form-control" id="konum" name="konum" required placeholder="Örn: 6.bölge">
-        </div>
-
-        <div class="mb-3">
-            <label for="bir_sonraki_bakim" class="form-label">Bir Sonraki Bakım Tarihi</label>
-            <input type="date" class="form-control" id="bir_sonraki_bakim" name="bir_sonraki_bakim">
-        </div>
-
-        <div class="mb-3">
-            <label for="son_bakim_tarihi" class="form-label">Son Bakım Tarihi</label>
-            <input type="date" class="form-control" id="son_bakim_tarihi" name="son_bakim_tarihi">
-        </div>
-
-        <div class="mb-3">
-            <label for="bakim_dongusu" class="form-label">Bakım Döngüsü</label>
-            <input list="donguList" class="form-control" id="bakim_dongusu" name="bakim_dongusu" placeholder="Örn: 2 ay, 1 yıl, 30 gün">
-            <datalist id="donguList">
-                <option value="7 gün">
-                <option value="15 gün">
-                <option value="1 ay">
-                <option value="2 ay">
-                <option value="3 ay">
-                <option value="6 ay">
-                <option value="1 yıl">
-                <option value="2 yıl">
-            </datalist>
-        </div>        
-
-        <div class="mb-3">
-            <label for="durum" class="form-label">Durum</label>
-            <select class="form-select" id="durum" name="durum" required>
-                <option value="">Durum Seçiniz</option>
-                <option value="Kullanıma hazır">Kullanıma Hazır</option>
-                <option value="Bakım Gerekli">Bakım Gerekli</option>
-                <option value="Arızalı">Arızalı</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="kisa_aciklama" class="form-label">Açıklama / Not</label>
-            <textarea class="form-control" id="kisa_aciklama" name="kisa_aciklama" rows="3"></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label for="yuk_kapasitesi" class="form-label">Yük Kapasitesi</label>
-            <input type="text" class="form-control" id="yuk_kapasitesi" name="yuk_kapasitesi" placeholder="Örn: 3m3">
-        </div>
-
-        <div class="mb-3">
-            <label for="sorumlu_kisi" class="form-label">Sorumlu Kişi</label>
-            <input type="text" class="form-control" id="sorumlu_kisi" name="sorumlu_kisi" placeholder="Örn: Erdal Kesici">
-        </div>
-
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end mt-3">
             <button type="submit" class="btn btn-primary">Kaydet</button>
             <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary ms-2">İptal</a>
         </div>

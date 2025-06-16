@@ -2,50 +2,53 @@
 {% block content %}
 <div class="container-fluid mt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">📦 Tüm Ekipmanlar</h4>
-        <a href="{{ url_for('main.add_parca') }}" class="btn btn-success">Yeni Malzeme Ekle</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-primary">📦 Ekipman Listesi</h3>
+        <div>
+            <a href="{{ url_for('main.add_parca') }}" class="btn btn-outline-success me-2">
+                <i class="fas fa-plus-circle me-1"></i> Yeni Malzeme Ekle
+            </a>
+            <a href="{{ url_for('main.export_excel') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-file-excel me-1"></i> Excel'e Aktar
+            </a>
+        </div>
     </div>
 
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ url_for('main.export_excel') }}" class="btn btn-success">
-            <i class="fas fa-file-excel me-1"></i> Excel'e Aktar
-        </a>
-    </div>
-    
-    <div class="card shadow-sm">
-        <div class="card-body table-responsive">
-            <table class="table table-hover align-middle">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <table class="table table-hover align-middle text-center">
                 <thead class="table-light">
-                    <tr>
-                        <th>Barkod</th>
-                        <th>Ekipman Türü</th>
-                        <th>Model</th>
-                        <th>Konum</th>
-                        <th>Durum</th>
-                        <th>İşlem</th>
+                    <tr class="align-middle">
+                        <th class="text-secondary">Barkod</th>
+                        <th class="text-secondary">Ekipman Türü</th>
+                        <th class="text-secondary">Model</th>
+                        <th class="text-secondary">Konum</th>
+                        <th class="text-secondary">Durum</th>
+                        <th class="text-secondary">İşlem</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for parca in parcalar %}
                     <tr>
-                        <td>{{ parca.barcode }}</td>
+                        <td class="fw-medium">{{ parca.barcode }}</td>
                         <td>{{ parca.ekipman_turu }}</td>
                         <td>{{ parca.model_adi }}</td>
                         <td>{{ parca.konum }}</td>
                         <td>
                             {% if parca.durum == 'Kullanıma hazır' %}
-                                <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> {{ parca.durum }}</span>
+                                <span class="badge bg-success py-2 px-3 rounded-pill"><i class="fas fa-check me-1"></i> {{ parca.durum }}</span>
                             {% elif parca.durum == 'Bakım Gerekli' %}
-                                <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-circle me-1"></i> {{ parca.durum }}</span>
+                                <span class="badge bg-warning text-dark py-2 px-3 rounded-pill"><i class="fas fa-wrench me-1"></i> {{ parca.durum }}</span>
                             {% elif parca.durum == 'Arızalı' %}
-                                <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> {{ parca.durum }}</span>
+                                <span class="badge bg-danger py-2 px-3 rounded-pill"><i class="fas fa-times me-1"></i> {{ parca.durum }}</span>
                             {% else %}
-                                <span class="badge bg-secondary">{{ parca.durum }}</span>
+                                <span class="badge bg-secondary py-2 px-3 rounded-pill">{{ parca.durum }}</span>
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="btn btn-sm btn-outline-primary">detay</a>
+                            <a href="{{ url_for('main.detail', parca_id=parca.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="fas fa-eye me-1"></i> Detay
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}

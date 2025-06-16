@@ -32,4 +32,16 @@
             <button type="submit" class="btn btn-primary w-100">Site Adını Güncelle</button>
         </form>
 
+        <!-- Bakım Yaklaşma Günü Güncelleme -->
+        <h5 class="mt-5">Bakım Yaklaşma Gün Sayısı</h5>
+        <form method="POST" action="/settings">
+            <div class="mb-3">
+                <label for="bakim_yaklasma_gunu" class="form-label">Bakım yaklaşmadan önceki gün sayısı</label>
+                <input type="number" class="form-control" id="bakim_yaklasma_gunu" name="bakim_yaklasma_gunu"
+                       value="{{ setting.bakim_yaklasma_gunu if setting else '' }}" required>
+            </div>
+            <button type="submit" class="btn btn-info w-100">Süreyi Güncelle</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

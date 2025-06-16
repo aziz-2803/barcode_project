@@ -14,9 +14,11 @@
             height: 100vh;
             margin: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
+
         .login-card {
             background: rgba(255, 255, 255, 0.95);
             padding: 40px;
@@ -24,34 +26,51 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
+            text-align: center;
         }
+
         .login-title {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
             color: #003366;
         }
+
         .form-control {
             border-radius: 10px;
         }
+
         .btn-primary {
             background-color: #0066cc;
             border-radius: 10px;
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
+
         .btn-primary:hover {
             background-color: #004c99;
         }
+
         img {
             width: 80px;
             margin-bottom: 15px;
+        }
+
+        .footer-text {
+            margin-top: 25px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+            background-color: rgba(0,0,0,0.4);
+            padding: 10px 20px;
+            border-radius: 10px;
+            max-width: 600px;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card text-center">
+    <div class="login-card">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
         <div class="login-title">Liman Bakım Takip Yönetimi</div>
         <form method="POST" action="{{ url_for('auth.login') }}">
@@ -65,6 +84,10 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
         </form>
+    </div>
+
+    <div class="footer-text">
+        Bu sistem, öğrenciler <strong>Abdelaziz Gamal</strong>, <strong>Setenay Erdem</strong>, <strong>Kübra Topal</strong> ve <strong>Sinem Akgül</strong> tarafından geliştirilmiş olup, <strong>Prof. Dr. Sermin Elevli</strong> danışmanlığında yürütülmektedir.
     </div>
 
 </body>
