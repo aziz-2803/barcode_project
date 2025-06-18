@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container-fluid">
-    <h2 class="mb-4">➕ Yeni Malzeme Ekle</h2>
+    <h2 class="mb-4">➕ Yeni Ekipman Ekle</h2>
 
     <form action="{{ url_for('main.add_parca') }}" method="POST" class="card p-4 shadow-sm bg-white rounded-4">
 
@@ -46,11 +46,7 @@
                 <textarea class="form-control" id="kisa_aciklama" name="kisa_aciklama" rows="3" placeholder="Varsa açıklama giriniz..."></textarea>
             </div>
 
-            <div class="col-md-12 mb-3">
-                <label for="notlar" class="form-label">İç Notlar (Opsiyonel)</label>
-                <textarea class="form-control" id="notlar" name="notlar" rows="2" placeholder="Sadece iç kullanım için notlar..."></textarea>
-            </div>
-
+    
             <div class="col-md-6 mb-3">
                 <label for="durum" class="form-label">Durum</label>
                 <select class="form-select" id="durum" name="durum" required>
